@@ -1,11 +1,12 @@
+// src/app/components/employee-form-component/employee-form-component.ts
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { UserService } from '../../services/user-service';
 import { EmployeeService } from '../../services/employee-service';
-import { RoleType } from '../../models/user-creation.model';
-import { ShiftType } from '../../models/employee-request.model';
+import { RoleType, UserDtoRequestCreation } from '../../models/user-creation.model';
+import { ShiftType, EmployeeDtoRequest } from '../../models/employee-request.model';
 
 @Component({
   selector: 'app-employee-form',
@@ -22,15 +23,21 @@ export class EmployeeFormComponent {
     name: '',
     surname: '',
     dni: '',
+    gender: '',
     email: '',
     phoneNumber: '',
+    address: '',
     birthDay: '',
-    role: 'RECEPCIONIST' as RoleType, // Rol por defecto (excluyendo GUEST por lógica de empleado)
+    role: 'RECEPCIONIST' as RoleType,
+    // Campos específicos de empleado
     shift: 'MORNING' as ShiftType,
-    salary: 0
+    salary: 0,
+    employeeNumber: '',
+    emergencyPhoneNumber: '',
+    hireDate: ''
   };
 
-  // Roles permitidos para empleados (según tu enum de Java, omitiendo GUEST)
+  // Roles permitidos para empleados (omitiendo GUEST)
   availableRoles: RoleType[] = [
     'ADMIN',
     'RECEPCIONIST',
@@ -39,7 +46,7 @@ export class EmployeeFormComponent {
     'RELIEF_STAFF'
   ];
 
-  // Turnos disponibles (según tu enum Shift de Java)
+  // Turnos disponibles
   availableShifts: ShiftType[] = [
     'MORNING',
     'AFTERNOON',
@@ -60,24 +67,29 @@ export class EmployeeFormComponent {
     this.loading = true;
     this.errorMessage = '';
 
-    // Paso 1: Crear el Usuario base
-    const userRequest = {
+    // Paso 1: Crear el Usuario base tipado correctamente
+    const userRequest: UserDtoRequestCreation = {
       username: this.formData.username,
       password: this.formData.password,
       name: this.formData.name,
       surname: this.formData.surname,
       dni: this.formData.dni,
+      gender: this.formData.gender || undefined,
       email: this.formData.email,
       phoneNumber: this.formData.phoneNumber,
-      birthDay: this.formData.birthDay ? this.formData.birthDay : undefined,
+      address: this.formData.address || undefined,
+      birthDay: this.formData.birthDay, // Requerido por el modelo actualizado
       role: this.formData.role
     };
 
     this.userService.createUser(userRequest).subscribe({
       next: (createdUser) => {
-        // Paso 2: Con el ID del usuario creado, creamos el perfil de empleado
-        const employeeRequest = {
+        // Paso 2: Crear el perfil de empleado incluyendo 'hireDate' requerido por el DTO
+        const employeeRequest: EmployeeDtoRequest = {
           userId: createdUser.id,
+          employeeNumber: this.formData.employeeNumber || undefined,
+          emergencyPhoneNumber: this.formData.emergencyPhoneNumber || undefined,
+          hireDate: this.formData.hireDate,
           shift: this.formData.shift,
           salary: Number(this.formData.salary)
         };
@@ -87,7 +99,7 @@ export class EmployeeFormComponent {
             this.loading = false;
             this.router.navigate(['/dashboard/employees']);
           },
-          error: (err) => {
+          error: (err: any) => {
             this.loading = false;
             this.errorMessage = 'El usuario se creó, pero ocurrió un error al asociar el perfil de empleado.';
             this.cdr.markForCheck();
@@ -95,7 +107,7 @@ export class EmployeeFormComponent {
           }
         });
       },
-      error: (err) => {
+      error: (err: any) => {
         this.loading = false;
         this.errorMessage = err.error?.message || 'Error al crear el usuario. Verifique los datos ingresados (DNI o email duplicados).';
         this.cdr.markForCheck();

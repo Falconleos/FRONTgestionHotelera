@@ -1,3 +1,4 @@
+// src/app/components/employee-list/employee-list.component.ts
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -56,12 +57,12 @@ export class EmployeeListComponent implements OnInit {
     this.errorMessage = '';
     
     this.employeeService.getAll().subscribe({
-      next: (data) => {
+      next: (data: EmployeeDtoResponse[]) => {
         this.employees = Array.isArray(data) ? [...data] : [];
         this.loading = false;
         this.cdr.markForCheck();
       },
-      error: (err) => {
+      error: (err: any) => {
         this.errorMessage = 'No se pudieron cargar los empleados o no cuentas con los permisos necesarios.';
         this.loading = false;
         this.cdr.markForCheck();
@@ -79,10 +80,10 @@ export class EmployeeListComponent implements OnInit {
     if (confirm('¿Estás seguro de que deseas eliminar el perfil de este empleado?')) {
       this.employeeService.deleteEmployee(id).subscribe({
         next: () => {
-          this.employees = this.employees.filter(emp => emp.id !== id);
+          this.employees = this.employees.filter((emp: EmployeeDtoResponse) => emp.id !== id);
           this.cdr.markForCheck();
         },
-        error: (err) => {
+        error: (err: any) => {
           alert('Error al eliminar el empleado. Recuerda que esta acción requiere rol ADMIN.');
           console.error(err);
         }

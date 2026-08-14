@@ -1,3 +1,4 @@
+// src/app/models/user.model.ts
 export type RoleType = 'ADMIN' | 'RECEPCIONIST' | 'HOUSEKEEPING' | 'MAINTENANCE' | 'RELIEF_STAFF' | 'GUEST';
 
 export interface UserDtoRequestCreation {
@@ -6,8 +7,10 @@ export interface UserDtoRequestCreation {
   name: string;
   surname: string;
   dni: string;
+  gender?: string;
   email: string;
-  phoneNumber: string;
-  birthDay?: string; // Formato 'yyyy-MM-dd'
-  role: RoleType;
+  phoneNumber?: string;
+  address?: string;
+  birthDay?: string; // Formato 'yyyy-MM-dd' (requerido por @NotNull en Java)
+  role: RoleType;   // Requerido por @NotNull en Java
 }

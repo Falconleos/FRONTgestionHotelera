@@ -1,6 +1,7 @@
+// src/app/components/user-list/user-list.component.ts
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router'; // <--- 1. Importar Router aquí
+import { Router, RouterLink } from '@angular/router';
 import { UserService } from '../../services/user-service';
 import { UserDtoResponse } from '../../models/user.model';
 import { AuthService } from '../../services/auth-service';
@@ -21,7 +22,7 @@ export class UserListComponent implements OnInit {
   constructor(
     private userService: UserService,
     private authService: AuthService,
-    private router: Router, // <--- 2. Inyectar Router aquí
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
