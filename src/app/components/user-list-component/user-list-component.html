@@ -1,0 +1,81 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4 header-section">
+    <h2><i class="fa-solid fa-users-gear me-2"></i> Gestión de Usuarios</h2>
+    <button 
+        class="btn btn-primary" 
+        (click)="goToNewUser()" 
+        [disabled]="!canModify">
+        <i class="fa-solid fa-user-plus me-2"></i> Nuevo Usuario
+    </button>
+  </div>
+  <hr class="mb-4">
+
+  <!-- Mensajes de carga o error -->
+  <div *ngIf="loading" class="alert alert-info">
+    <i class="fa-solid fa-spinner fa-spin me-2"></i> Cargando registros...
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ errorMessage }}
+  </div>
+
+  <!-- Tabla de datos -->
+  <div class="table-responsive" *ngIf="!loading && !errorMessage && users.length > 0">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Username</th>
+          <th>Nombre y Apellido</th>
+          <th>DNI</th>
+          <th>Email</th>
+          <th>Teléfono</th>
+          <th>Roles</th>
+          <th>Estado</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users">
+          <td>{{ user.id }}</td>
+          <td><strong>{{ user.username }}</strong></td>
+          <td>{{ user.name }} {{ user.surname }}</td>
+          <td>{{ user.dni }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.phoneNumber || '-' }}</td>
+          <td>
+            <span *ngFor="let role of user.roles; let last = last" class="badge bg-secondary me-1">
+              <i class="fa-solid fa-shield-halved me-1"></i>{{ role.name }}{{ !last ? ', ' : '' }}
+            </span>
+          </td>
+          <td>
+            <span class="badge" [ngClass]="user.enabled ? 'bg-success' : 'bg-danger'">
+              <i class="fa-solid" [ngClass]="user.enabled ? 'fa-circle-check' : 'fa-circle-xmark'"></i>
+              {{ user.enabled ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+          <td class="text-center">
+            <button 
+              class="btn btn-warning btn-sm me-1" 
+              [routerLink]="canModify ? ['/dashboard/usuarios/editar', user.id] : null" 
+              [disabled]="!canModify"
+              title="Editar usuario">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <button 
+              class="btn btn-danger btn-sm" 
+              (click)="deleteUser(user.id)" 
+              [disabled]="!canModify"
+              title="Eliminar usuario">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Mensaje si la lista está vacía -->
+  <div *ngIf="!loading && !errorMessage && users.length === 0" class="alert alert-warning">
+    <i class="fa-solid fa-circle-info me-2"></i> No se encontraron usuarios registrados en el sistema.
+  </div>
+</div>

@@ -1,0 +1,63 @@
+<div class="container mt-4">
+  <h2>
+    <i class="fa-solid fa-door-closed me-2">&nbsp;</i> Nueva Habitación Física
+  </h2>
+  <p class="text-subtitle mb-4">
+    Completa la información para registrar una nueva habitación en el sistema.
+  </p>
+  <hr class="mb-4">
+
+  <!-- Alerta de Error -->
+  <div *ngIf="errorMessage" class="alert alert-danger mb-4">
+    <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ errorMessage }}
+  </div>
+
+  <!-- Formulario Principal con Estilo Glass -->
+  <form [formGroup]="roomForm" (ngSubmit)="onSubmit()" class="glass-form">
+    
+    <div class="mb-4">
+      <label for="number" class="form-label">Número de Habitación *</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="fa-solid fa-hashtag"></i></span>
+        <input 
+          type="number" 
+          id="number" 
+          class="form-control marginUpDown" 
+          formControlName="number" 
+          placeholder="Ej. 101">
+      </div>
+      <div *ngIf="roomForm.get('number')?.touched && roomForm.get('number')?.invalid" class="text-danger small mt-1">
+        <span *ngIf="roomForm.get('number')?.errors?.['required']">El número es obligatorio.</span>
+        <span *ngIf="roomForm.get('number')?.errors?.['min']">Debe ser un número positivo.</span>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label for="roomTypeId" class="form-label">Tipo de Habitación *</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="fa-solid fa-list"></i></span>
+        <select id="roomTypeId" class="form-control custom-select marginUpDown" formControlName="roomTypeId">
+          <option value="" disabled>Seleccione un tipo de habitación</option>
+          <option *ngFor="let type of roomTypes" [value]="type.id">
+            {{ type.name }} - Capacidad: {{ type.capacity }} - ${{ type.pricePerNight }}/noche
+          </option>
+        </select>
+      </div>
+      <div *ngIf="roomForm.get('roomTypeId')?.touched && roomForm.get('roomTypeId')?.invalid" class="text-danger small mt-1">
+        <span *ngIf="roomForm.get('roomTypeId')?.errors?.['required']">Debe seleccionar un tipo de habitación.</span>
+      </div>
+    </div>
+
+    <!-- Botones de Acción -->
+    <div class="form-actions-container">
+      <button type="button" class="btn btn-secondary" routerLink="/dashboard/rooms">
+        <i class="fa-solid fa-arrow-left me-1"></i> Cancelar
+      </button>
+      <button type="submit" class="btn btn-success" [disabled]="loading || loadingTypes">
+        <i class="fa-solid" [ngClass]="loading || loadingTypes ? 'fa-spinner fa-spin' : 'fa-check'"></i> 
+        Crear Habitación
+      </button>
+    </div>
+
+  </form>
+</div>

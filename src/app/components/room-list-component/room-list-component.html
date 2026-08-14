@@ -1,0 +1,135 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="fa-solid fa-door-open me-2">&nbsp;</i> Gestión de Habitaciones y Tipos</h2>
+    <div>
+      <button 
+        class="btn btn-success marginExtra" 
+        [routerLink]="isAdmin ? '/dashboard/room-types/nuevo' : null" 
+        [disabled]="!isAdmin">
+        <i class="fa-solid fa-plus me-1"></i> Nuevo Tipo de Habitación
+      </button>
+    </div>
+  </div>
+  <hr class="mb-4">
+
+  <!-- Sección de Tipos de Habitación -->
+  <div class="mb-5">
+    <h3 class="results-title mb-3">Tipos de Habitación Registrados</h3>
+    
+    <div *ngIf="loadingTypes" class="alert alert-info mb-4">
+      <i class="fa-solid fa-spinner fa-spin me-2"></i> Cargando tipos de habitación...
+    </div>
+    <div *ngIf="errorTypesMessage" class="alert alert-danger mb-4">
+      <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ errorTypesMessage }}
+    </div>
+
+    <div *ngIf="!loadingTypes && !errorTypesMessage && roomTypes.length > 0" class="row">
+      <div class="col-md-3 mb-4" *ngFor="let rType of roomTypes">
+        <div class="glass-card h-100">
+          <div class="card-body d-flex flex-column justify-content-between">
+            <div>
+              <h5 class="card-title text-main">{{ rType.name }}</h5>
+              <h6 class="card-subtitle mb-2 text-subtitle">Capacidad: {{ rType.capacity }} pers.</h6>
+              <p class="card-text small mb-3 text-subtitle">{{ rType.description || 'Sin descripción' }}</p>
+              <p class="card-text fw-bold text-success-price mb-3">${{ rType.pricePerNight | number:'1.2-2' }} <span class="text-subtitle fw-normal">/ noche</span></p>
+            </div>
+            
+            <div class="mt-2">
+              <button [routerLink]="['/dashboard/rooms/nuevo']" [queryParams]="{ roomTypeId: rType.id }" class="btn btn-primary btn-sm w-100 mb-2">
+                <i class="fa-solid fa-plus me-1"></i> Crear Habitación
+              </button>
+              
+              <div class="d-flex justify-content-between gap-2 marginVertical" *ngIf="isAdmin">
+                <button 
+                  class="btn btn-warning btn-sm w-50 " 
+                  [routerLink]="['/dashboard/room-types/editar', rType.id]">
+                  <i class="fa-solid fa-pen-to-square"></i> Editar
+                </button>
+                <button 
+                  class="btn btn-danger btn-sm w-50 marginLeft" 
+                  (click)="deleteRoomType(rType.id)">
+                  <i class="fa-solid fa-trash"></i> Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!loadingTypes && !errorTypesMessage && roomTypes.length === 0" class="alert alert-warning text-center py-4">
+      <i class="fa-solid fa-circle-exclamation me-2"></i> No se encontraron tipos de habitación registrados.
+    </div>
+  </div>
+
+  <hr class="my-4">
+
+  <!-- Sección de Habitaciones (Listado general) -->
+  <h3 class="results-title mb-3">Listado de Habitaciones</h3>
+
+  <!-- Mensajes de carga o error -->
+  <div *ngIf="loading" class="alert alert-info mb-4">
+    <i class="fa-solid fa-spinner fa-spin me-2"></i> Cargando habitaciones...
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-danger mb-4">
+    <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ errorMessage }}
+  </div>
+
+  <!-- Tabla de datos con Estilo Glass -->
+  <div *ngIf="!loading && !errorMessage && rooms.length > 0" class="glass-table-container">
+    <div class="table-responsive mb-0">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th class="ps-4">ID</th>
+            <th>Nro. Habitación</th>
+            <th>Tipo</th>
+            <th>Capacidad</th>
+            <th>Precio por Noche</th>
+            <th>Estado</th>
+            <th class="text-end pe-4">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let room of rooms">
+            <td class="ps-4 text-secondary">#{{ room.id }}</td>
+            <td><strong class="text-main">#{{ room.number }}</strong></td>
+            <td><span class="text-main fw-medium">{{ room.roomTypeName }}</span></td>
+            <td><span class="text-subtitle">{{ room.capacity }} pers.</span></td>
+            <td class="text-main fw-semibold">${{ room.pricePerNight | number:'1.2-2' }}</td>
+            <td>
+              <span class="badge" [ngClass]="{
+                'badge-success-glass': room.state === 'AVAILABLE',
+                'badge-danger-glass': room.state === 'OCCUPIED',
+                'badge-warning-glass': room.state === 'MAINTENANCE'
+              }">
+                {{ room.state }}
+              </span>
+            </td>
+            <td class="text-end pe-4">
+              <div class="btn-group btn-group-sm" role="group">
+                <button 
+                  class="btn btn-warning me-1"  
+                  [routerLink]="isAdmin ? ['/dashboard/rooms/editar', room.id] : null" 
+                  [disabled]="!isAdmin" title="Editar habitación">
+                  <i class="fa-solid fa-pen-to-square "></i>
+                </button>
+                <button 
+                  class="btn btn-danger marginLeft" 
+                  (click)="deleteRoom(room.id)" 
+                  [disabled]="!isAdmin" title="Eliminar habitación">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Mensaje si la lista está vacía -->
+  <div *ngIf="!loading && !errorMessage && rooms.length === 0" class="alert alert-warning text-center py-4">
+    <i class="fa-solid fa-circle-exclamation me-2"></i> No se encontraron habitaciones registradas en el sistema.
+  </div>
+</div>

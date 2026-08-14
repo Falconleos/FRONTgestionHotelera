@@ -1,0 +1,253 @@
+:host {
+  background-color: transparent !important;
+  display: block;
+  min-height: 100vh;
+}
+
+.container {
+  padding: 4px;
+  max-width: 100%;
+}
+
+/* Mayor separación superior para toda la cabecera */
+.header-section {
+  margin-top: 8px;
+}
+
+.container h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #f8fafc;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.container h2 i {
+  color: #818cf8;
+}
+
+.container hr {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Contenedor de la tabla con efecto Glass y scroll horizontal optimizado */
+.table-responsive {
+  background: rgba(15, 23, 42, 0.65);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow-x: auto;
+  width: 100%;
+}
+
+/* Personalización de la barra de desplazamiento horizontal */
+.table-responsive::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.4);
+  border-radius: 0 0 16px 16px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.table {
+  background-color: transparent;
+  margin-bottom: 0;
+  vertical-align: middle;
+  color: #f8fafc;
+  white-space: nowrap; /* Evita que el texto de las celdas se rompa de manera fea */
+}
+
+.table thead {
+  background: rgba(15, 23, 42, 0.9) !important;
+  color: #ffffff;
+}
+
+.table thead th {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 14px 16px; 
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #94a3b8;
+}
+
+.table tbody tr {
+  transition: background-color 0.15s ease-in-out;
+}
+
+.table tbody tr td {
+  padding: 14px 16px; 
+  font-size: 13px;
+  color: #f8fafc;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+/* Columna de Acciones Fija (Sticky) a la derecha para que nunca se pierda */
+.table th:last-child,
+.table td:last-child {
+  position: sticky;
+  right: 0;
+  background: rgba(15, 23, 42, 0.95);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  z-index: 2;
+  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.table thead th:last-child {
+  z-index: 3;
+}
+
+/* Badges con estilo traslúcido */
+.badge {
+  font-weight: 600;
+  padding: 5px 8px;
+  font-size: 11px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.badge.bg-info {
+  background: rgba(56, 189, 248, 0.2) !important;
+  color: #38bdf8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.badge.bg-secondary {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #cbd5e1 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.badge.bg-success {
+  background: rgba(16, 185, 129, 0.2) !important;
+  color: #34d399 !important;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge.bg-danger {
+  background: rgba(239, 68, 68, 0.2) !important;
+  color: #fca5a5 !important;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Estilos generales de botones */
+.btn {
+  font-weight: 600;
+  font-size: 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+}
+
+.btn-sm {
+  padding: 5px 9px;
+  border-radius: 6px;
+}
+
+/* Botón Nuevo Empleado (Estilo Principal) */
+.btn-primary {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.4), rgba(79, 70, 229, 0.2));
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(129, 140, 248, 0.3);
+  color: #ffffff !important;
+  font-weight: 600;
+  padding: 10px 18px;
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.6), rgba(79, 70, 229, 0.4));
+  border-color: rgba(129, 140, 248, 0.5);
+  color: #ffffff !important;
+  transform: translateY(-1px);
+}
+
+/* Botón Warning (Editar) */
+.btn-warning {
+  background: rgba(245, 158, 11, 0.2);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #fcd34d;
+}
+
+.btn-warning:hover:not(:disabled) {
+  background: rgba(245, 158, 11, 0.35);
+  border-color: rgba(245, 158, 11, 0.5);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+/* Botón Danger (Eliminar) */
+.btn-danger {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.35);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Alertas estilo Glass */
+.alert {
+  border-radius: 10px;
+  font-size: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  padding: 1rem;
+}
+
+.alert-info {
+  background: rgba(59, 130, 246, 0.15);
+  color: #93c5fd;
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.alert-danger {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.alert-warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fcd34d;
+  border-color: rgba(245, 158, 11, 0.3);
+}

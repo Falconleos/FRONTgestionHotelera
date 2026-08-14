@@ -1,0 +1,95 @@
+<div class="container mt-4">
+  <h2><i class="fa-solid fa-calendar-check me-2 paddingWitdth"></i> Completar datos de la reserva</h2>
+  <p class="text-subtitle mb-4">Ingresa la información del titular para registrar la nueva reserva en el sistema.</p>
+  <hr class="mb-4">
+
+  <!-- Alerta de Error -->
+  <div *ngIf="errorMessage" class="alert alert-danger mb-4">
+    <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ errorMessage }}
+  </div>
+
+  <!-- Resumen de Selección Previa (Banner Superior Estilo Glass) -->
+  <div class="glass-summary-card mb-4" *ngIf="bookingData">
+    <div class="d-flex align-items-center mb-3">
+      <div class="summary-icon-box me-3">
+        <i class="fa-solid fa-door-open"></i>
+      </div>
+      <div>
+        <h5 class="fw-bold text-main mb-0">Habitación {{ bookingData.room.number }}</h5>
+        <span class="text-subtitle">{{ bookingData.room.roomTypeName }}</span>
+      </div>
+    </div>
+    
+    <div class="row g-3 pt-3 summary-divider">
+      <div class="col-sm-6">
+        <div class="d-flex align-items-center text-subtitle">
+          <i class="fa-solid fa-calendar-days me-2 text-indigo"></i>
+          <span><strong class="text-main paddingWitdth">Estadía:</strong> {{ bookingData.checkIn }} al {{ bookingData.checkOut }}</span>
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="d-flex align-items-center text-subtitle">
+          <i class="fa-solid fa-users me-2 text-indigo"></i>
+          <span><strong class="text-main paddingWitdth">Huéspedes:</strong> {{ bookingData.guestCount }} persona(s)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulario Principal -->
+  <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()" class="glass-form">
+    
+    <h4 class="form-section-title">Información del Titular</h4>
+    <div class="row g-3 mb-4">
+      
+      <div class="col-md-6">
+        <label for="guestFirstName" class="form-label">Nombre *</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+          <input type="text" id="guestFirstName" class="form-control marginExtra" formControlName="guestFirstName" placeholder="Ej: Juan">
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <label for="guestLastName" class="form-label">Apellido *</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="fa-solid fa-id-card"></i></span>
+          <input type="text" id="guestLastName" class="form-control marginExtra" formControlName="guestLastName" placeholder="Ej: Pérez">
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <label for="guestPhone" class="form-label">Teléfono de Contacto *</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
+          <input type="text" id="guestPhone" class="form-control marginExtra" formControlName="guestPhone" placeholder="Ej: +54 9 223 1234567">
+        </div>
+      </div>
+
+    </div>
+
+    <hr class="section-divider mb-4">
+
+    <h4 class="form-section-title">Adicionales</h4>
+    <div class="row g-3 mb-4">
+      <div class="col-12">
+        <label for="observation" class="form-label">Observaciones (Opcional)</label>
+        <textarea id="observation" class="form-control custom-textarea" formControlName="observation" rows="3" placeholder="Aclaraciones, horarios estimados de llegada o pedidos especiales..."></textarea>
+      </div>
+    </div>
+
+    <hr class="section-divider mb-4">
+
+    <!-- Botones de Acción -->
+    <div class="form-actions-container">
+      <button type="button" class="btn btn-secondary" routerLink="/dashboard/bookings/disponibilidad">
+        <i class="fa-solid fa-arrow-left me-1"></i> Volver
+      </button>
+      <button type="submit" class="btn btn-success" [disabled]="bookingForm.invalid || loading">
+        <i class="fa-solid" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-check'"></i> 
+        {{ loading ? 'Guardando reserva...' : 'Confirmar Creación de Reserva' }}
+      </button>
+    </div>
+
+  </form>
+</div>

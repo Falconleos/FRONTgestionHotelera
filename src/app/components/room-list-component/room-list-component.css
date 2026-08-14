@@ -1,0 +1,300 @@
+:host {
+  background-color: transparent !important;
+  display: block;
+  min-height: 100vh;
+}
+
+.container {
+  padding: 4px;
+}
+
+.container h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #f8fafc;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.container h2 i {
+  color: #818cf8;
+}
+
+.results-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+.text-subtitle {
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.text-main {
+  color: #f8fafc;
+}
+
+.text-indigo {
+  color: #818cf8;
+}
+
+.text-success-price {
+  color: #34d399;
+  font-size: 1.05rem;
+}
+
+.container hr {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* --- Cards de Tipos de Habitación con Glassmorphism --- */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -0.5rem;
+  margin-left: -0.5rem;
+}
+
+.col-md-3 {
+  flex: 0 0 auto;
+  width: 25%;
+  padding-right: 0.5rem;
+  padding-left: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.glass-card {
+  background: rgba(15, 23, 42, 0.65);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  height: 100%;
+}
+
+.glass-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+  border-color: rgba(129, 140, 248, 0.3);
+}
+
+.card-body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #f8fafc !important;
+  margin-bottom: 0.25rem;
+}
+
+.card-subtitle {
+  font-size: 0.8rem;
+  color: #94a3b8 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.card-text {
+  color: #cbd5e1;
+  font-size: 0.85rem;
+}
+
+/* --- Contenedor de la Tabla con Glassmorphism --- */
+.glass-table-container {
+  background: rgba(15, 23, 42, 0.65);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.table {
+  background-color: transparent;
+  margin-bottom: 0;
+  vertical-align: middle;
+  color: #f8fafc;
+}
+
+.table thead {
+  background: rgba(15, 23, 42, 0.9) !important;
+}
+
+.table thead th {
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 16px 20px;
+  background: rgba(15, 23, 42, 0.9) !important;
+  color: #94a3b8 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.table tbody tr td {
+  padding: 16px 20px;
+  font-size: 14px;
+  color: #f8fafc;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+/* --- Badges Translúcidos --- */
+.badge {
+  font-weight: 500;
+  padding: 0.45em 0.75em;
+  font-size: 0.75rem;
+  border-radius: 6px;
+}
+
+.badge-success-glass {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #34d399 !important;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge-danger-glass {
+  background: rgba(239, 68, 68, 0.15) !important;
+  color: #fca5a5 !important;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badge-warning-glass {
+  background: rgba(245, 158, 11, 0.15) !important;
+  color: #fcd34d !important;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+/* --- Botones --- */
+.btn {
+  font-weight: 500;
+  font-size: 0.8rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  padding: 0.4rem 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.btn-success {
+  background: rgba(16, 185, 129, 0.25);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #34d399;
+}
+
+.btn-success:hover:not(:disabled) {
+  background: rgba(16, 185, 129, 0.4);
+  color: #ffffff;
+  border-color: rgba(16, 185, 129, 0.6);
+}
+
+.btn-primary {
+  background: rgba(59, 130, 246, 0.25);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  color: #93c5fd;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: rgba(59, 130, 246, 0.4);
+  color: #ffffff;
+  border-color: rgba(59, 130, 246, 0.6);
+}
+
+.btn-warning {
+  background: rgba(245, 158, 11, 0.25);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fcd34d;
+}
+
+.btn-warning:hover:not(:disabled) {
+  background: rgba(245, 158, 11, 0.4);
+  color: #ffffff;
+  border-color: rgba(245, 158, 11, 0.6);
+}
+
+.btn-danger {
+  background: rgba(239, 68, 68, 0.25);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.4);
+  color: #ffffff;
+  border-color: rgba(239, 68, 68, 0.6);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.05);
+  color: #64748b;
+}
+
+/* --- Alertas Glass --- */
+.alert-danger {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.alert-info {
+  background: rgba(59, 130, 246, 0.15);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.alert-warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fcd34d;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.marginExtra{
+  margin: 12px;
+}
+
+.marginVertical{
+  margin: 12px 0px;
+}
+
+.marginLeft{
+  margin-left: 12px;
+}

@@ -1,0 +1,71 @@
+<div class="dashboard-layout">
+  <!-- Barra Lateral (Sidebar) con Glassmorphism -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2><i class="fa-solid fa-hotel"></i> Ultimate Hotel Software</h2>
+    </div>
+    <nav class="sidebar-nav">
+      <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        <i class="fa-solid fa-table-cells-large"></i> Inicio
+      </a>
+      <a routerLink="/dashboard/bookings" routerLinkActive="active">
+        <i class="fa-solid fa-calendar-days"></i> Reservas
+      </a>
+      <a routerLink="/dashboard/check-ins" routerLinkActive="active" class="nav-link">
+        <i class="fa-solid fa-circle-check"></i> Estadías (Check-Ins)
+      </a>
+      <a routerLink="/dashboard/rooms" routerLinkActive="active">
+        <i class="fa-solid fa-bed"></i> Habitaciones
+      </a>
+      <a routerLink="/dashboard/items" routerLinkActive="active">
+        <i class="fa-solid fa-box-archive"></i> Items
+      </a>
+      <a routerLink="/dashboard/comments" routerLinkActive="active">
+        <i class="fa-solid fa-comments"></i> Comentarios
+      </a>
+      <a routerLink="/dashboard/payments" routerLinkActive="active">
+        <i class="fa-solid fa-wallet"></i> Pagos
+      </a>
+      <a routerLink="/dashboard/accounts" routerLinkActive="active">
+        <i class="fa-solid fa-file-invoice-dollar"></i> Cuentas
+      </a>
+      <a routerLink="/dashboard/usuarios" routerLinkActive="active">
+        <i class="fa-solid fa-users"></i> Usuarios
+      </a>
+      <a routerLink="/dashboard/employees" routerLinkActive="active">
+        <i class="fa-solid fa-id-badge"></i> Empleados
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button (click)="logout()" class="btn-logout">
+        <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+      </button>
+    </div>
+  </aside>
+
+  <!-- Contenido Principal -->
+  <main class="main-content">
+    <header class="top-bar">
+      <h3>Panel de Administración</h3>
+      <div class="top-bar-right">
+        <div class="top-actions">
+          <button class="icon-btn" title="Notificaciones">
+            <i class="fa-regular fa-bell"></i>
+          </button>
+          <button class="icon-btn" title="Configuración">
+            <i class="fa-solid fa-gear"></i>
+          </button>
+        </div>
+        <div class="divider"></div>
+        <span class="user-info">
+          Bienvenido, <strong>{{ username }}</strong> 
+          <span class="text-muted" *ngIf="userRoles">({{ userRoles }})</span>
+        </span>
+      </div>
+    </header>
+    
+    <div class="content-area">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

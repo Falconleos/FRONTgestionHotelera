@@ -1,0 +1,214 @@
+:host {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+}
+
+/* Contenedor general que asegura la cobertura total de pantalla y el fondo oscuro con degradado */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  background-color: #0f172a !important;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(30, 41, 59, 0.9) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(49, 46, 129, 0.6) 0px, transparent 50%) !important;
+}
+
+/* Tarjeta principal con efecto Glassmorphism */
+.login-card {
+  background: rgba(15, 23, 42, 0.65);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 420px;
+}
+
+/* Botón Volver a la Landing */
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(129, 140, 248, 0.3);
+  transform: translateX(-3px);
+}
+
+.btn-back i {
+  font-size: 11px;
+  transition: transform 0.3s ease;
+}
+
+.btn-back:hover i {
+  transform: translateX(-2px);
+}
+
+.login-card h2 {
+  margin-bottom: 0.75rem; /* Separación ampliada del título respecto al subtítulo */
+  color: #f8fafc;
+  font-size: 24px;
+  font-weight: 600;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px; /* Separa el icono del texto del título */
+}
+
+.login-card h2 i {
+  color: #818cf8;
+}
+
+.subtitle {
+  color: #94a3b8;
+  font-size: 13px;
+  margin-bottom: 2.5rem; /* Mayor respiro antes de empezar con los inputs */
+  text-align: center;
+}
+
+/* Separación personalizada entre cada campo del formulario */
+.field-spacing {
+  margin-bottom: 1.5rem;
+}
+
+/* Espaciado superior extra para separar el botón de entrar */
+.btn-submit-spacing {
+  margin-top: 1rem;
+}
+
+/* Etiquetas del formulario */
+.form-label {
+  color: #94a3b8;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* Input Groups e Iconos alineados */
+.input-group {
+  display: flex;
+  align-items: stretch;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.input-group-text {
+  background: rgba(15, 23, 42, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-right: none !important;
+  border-top-left-radius: 10px !important;
+  border-bottom-left-radius: 10px !important;
+  color: #94a3b8 !important;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input-group .form-control {
+  border-left: none !important;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-top-right-radius: 10px !important;
+  border-bottom-right-radius: 10px !important;
+}
+
+/* Inputs */
+.form-control {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #f8fafc;
+  padding: 10px 16px;
+  height: 44px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.form-control:focus {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(129, 140, 248, 0.5);
+  color: #ffffff;
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.25);
+  outline: none;
+}
+
+/* Alertas estilo Glass */
+.alert {
+  border-radius: 10px;
+  font-size: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  padding: 1rem;
+}
+
+.alert-danger {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* Botón de Ingreso con estilo Glass Principal */
+.btn-primary {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.4), rgba(79, 70, 229, 0.2));
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(129, 140, 248, 0.3);
+  color: #ffffff !important;
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 10px;
+  padding: 12px;
+  height: 46px;
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.6), rgba(79, 70, 229, 0.4));
+  border-color: rgba(129, 140, 248, 0.5);
+  transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

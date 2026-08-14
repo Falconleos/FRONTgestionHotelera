@@ -1,0 +1,81 @@
+<div class="container mt-4">
+  <h2><i class="fa-solid fa-user-plus me-2"></i> Create New User</h2>
+  <p class="text-subtitle mb-4">Add a new guest profile to the system. Fields marked with an asterisk (*) are required.</p>
+  <hr class="mb-4">
+
+  <div *ngIf="errorMessage" class="alert alert-danger mb-4">
+    <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ errorMessage }}
+  </div>
+
+  <form (ngSubmit)="onSubmit()" #userForm="ngForm" class="glass-form">
+    
+    <!-- Account Details Section -->
+    <h4 class="form-section-title">Account Details</h4>
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <label for="username" class="form-label">Username *</label>
+        <input type="text" id="username" class="form-control" name="username" [(ngModel)]="formData.username" required minlength="3" #username="ngModel" placeholder="ej. jperez">
+      </div>
+
+      <div class="col-md-6">
+        <label for="password" class="form-label">Password *</label>
+        <input type="password" id="password" class="form-control" name="password" [(ngModel)]="formData.password" required minlength="6" #password="ngModel" placeholder="••••••••">
+      </div>
+    </div>
+
+    <hr class="section-divider mb-4">
+
+    <!-- Personal Information Section -->
+    <h4 class="form-section-title">Personal Information</h4>
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <label for="name" class="form-label">First Name *</label>
+        <input type="text" id="name" class="form-control" name="name" [(ngModel)]="formData.name" required #name="ngModel" placeholder="Juan">
+      </div>
+
+      <div class="col-md-6">
+        <label for="surname" class="form-label">Last Name *</label>
+        <input type="text" id="surname" class="form-control" name="surname" [(ngModel)]="formData.surname" required #surname="ngModel" placeholder="Pérez">
+      </div>
+
+      <div class="col-md-6">
+        <label for="dni" class="form-label">DNI / ID Number *</label>
+        <input type="text" id="dni" class="form-control" name="dni" [(ngModel)]="formData.dni" required #dni="ngModel" placeholder="12345678">
+      </div>
+
+      <div class="col-md-6">
+        <label for="birthDay" class="form-label">Date of Birth</label>
+        <input type="date" id="birthDay" class="form-control" name="birthDay" [(ngModel)]="formData.birthDay">
+      </div>
+    </div>
+
+    <hr class="section-divider mb-4">
+
+    <!-- Contact Details Section -->
+    <h4 class="form-section-title">Contact Details</h4>
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <label for="email" class="form-label">Email Address *</label>
+        <input type="email" id="email" class="form-control" name="email" [(ngModel)]="formData.email" required email #email="ngModel" placeholder="juan@example.com">
+      </div>
+
+      <div class="col-md-6">
+        <label for="phoneNumber" class="form-label">Phone Number *</label>
+        <input type="text" id="phoneNumber" class="form-control" name="phoneNumber" [(ngModel)]="formData.phoneNumber" required #phone="ngModel" placeholder="+54 9 11...">
+      </div>
+    </div>
+
+    <hr class="section-divider mb-4">
+
+    <!-- Actions (Correctly aligned and spaced buttons) -->
+    <div class="form-actions-container">
+      <button type="button" class="btn btn-secondary" routerLink="/dashboard/usuarios">
+        Cancel
+      </button>
+      <button type="submit" class="btn btn-success" [disabled]="loading">
+        <i class="fa-solid" [ngClass]="loading ? 'fa-spinner fa-spin' : ''"></i> 
+        {{ loading ? 'Saving...' : 'Create User' }}
+      </button>
+    </div>
+  </form>
+</div>

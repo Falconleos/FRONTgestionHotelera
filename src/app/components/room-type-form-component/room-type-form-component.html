@@ -1,0 +1,104 @@
+<div class="container mt-4">
+  <h2>
+    <i class="fa-solid" [ngClass]="isEditMode ? 'fa-pen-to-square' : 'fa-circle-plus'">&nbsp;</i> 
+    {{ isEditMode ? 'Editar Tipo de Habitación' : 'Nuevo Tipo de Habitación' }}
+  </h2>
+  <p class="text-subtitle mb-4">
+    {{ isEditMode ? 'Modifica los datos del tipo de habitación seleccionado.' : 'Completa la información para registrar un nuevo tipo de habitación.' }}
+  </p>
+  <hr class="mb-4">
+
+  <!-- Mensajes de Estado -->
+  <div *ngIf="loading && isEditMode" class="alert alert-info mb-4">
+    <i class="fa-solid fa-spinner fa-spin me-2"></i> Cargando datos...
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-danger mb-4">
+    <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ errorMessage }}
+  </div>
+
+  <!-- Formulario Principal con Estilo Glass -->
+  <form [formGroup]="roomTypeForm" (ngSubmit)="onSubmit()" *ngIf="!loading || !isEditMode" class="glass-form">
+    
+    <div class="mb-4">
+      <label for="name" class="form-label">Nombre del Tipo *</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="fa-solid fa-tag"></i></span>
+        <input 
+          type="text" 
+          id="name" 
+          class="form-control marginUpDown inputWidth" 
+          formControlName="name" 
+          placeholder="Ej. SUITE_DELUXE">
+      </div>
+      <div *ngIf="roomTypeForm.get('name')?.touched && roomTypeForm.get('name')?.invalid" class="text-danger small mt-1">
+        <span *ngIf="roomTypeForm.get('name')?.errors?.['required']">El nombre es obligatorio.</span>
+        <span *ngIf="roomTypeForm.get('name')?.errors?.['minlength']">Debe tener al menos 1 caracter.</span>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label for="capacity" class="form-label">Capacidad Máxima *</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="fa-solid fa-users"></i></span>
+        <input 
+          type="number" 
+          id="capacity" 
+          class="form-control marginUpDown inputWidth" 
+          formControlName="capacity" 
+          placeholder="Ej. 4">
+      </div>
+      <div *ngIf="roomTypeForm.get('capacity')?.touched && roomTypeForm.get('capacity')?.invalid" class="text-danger small mt-1">
+        <span *ngIf="roomTypeForm.get('capacity')?.errors?.['required']">La capacidad es obligatoria.</span>
+        <span *ngIf="roomTypeForm.get('capacity')?.errors?.['min']">Debe ser mayor a 0.</span>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label for="description" class="form-label">Descripción</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="fa-solid fa-tag"></i></span>
+        <textarea 
+        id="description" 
+        class="form-control custom-textarea inputWidth" 
+        rows="3" 
+        formControlName="description" 
+        placeholder="Detalle de los servicios o comodidades..."></textarea>
+      </div>
+      
+      <div *ngIf="roomTypeForm.get('description')?.touched && roomTypeForm.get('description')?.invalid" class="text-danger small mt-1">
+        <span *ngIf="roomTypeForm.get('description')?.errors?.['required']">La descripción es obligatoria.</span>
+        <span *ngIf="roomTypeForm.get('description')?.errors?.['maxlength']">No puede superar los 250 caracteres.</span>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label for="pricePerNight" class="form-label">Precio por Noche ($) *</label>
+      <div class="input-group">
+        <span class="input-group-text block"><i class="fa-solid fa-dollar-sign"></i></span>
+        <input 
+          type="number" 
+          step="0.01" 
+          id="pricePerNight" 
+          class="form-control marginUpDown inputWidth" 
+          formControlName="pricePerNight" 
+          placeholder="Ej. 150.00">
+      </div>
+      <div *ngIf="roomTypeForm.get('pricePerNight')?.touched && roomTypeForm.get('pricePerNight')?.invalid" class="text-danger small mt-1">
+        <span *ngIf="roomTypeForm.get('pricePerNight')?.errors?.['required']">El precio es obligatorio.</span>
+        <span *ngIf="roomTypeForm.get('pricePerNight')?.errors?.['min']">Debe ser un valor positivo.</span>
+      </div>
+    </div>
+
+    <!-- Botones de Acción -->
+    <div class="form-actions-container">
+      <button type="button" class="btn btn-secondary" routerLink="/dashboard/rooms">
+        <i class="fa-solid fa-arrow-left me-1"></i> Cancelar
+      </button>
+      <button type="submit" class="btn btn-success" [disabled]="loading">
+        <i class="fa-solid" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-check'"></i> 
+        {{ isEditMode ? 'Guardar Cambios' : 'Crear Tipo de Habitación' }}
+      </button>
+    </div>
+
+  </form>
+</div>

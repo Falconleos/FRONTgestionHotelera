@@ -1,0 +1,85 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="fa-solid fa-comments me-2"></i> Gestión de Comentarios</h2>
+    <button 
+      class="btn btn-primary" 
+      (click)="onNewCommentClick()">
+      <i class="fa-solid fa-plus me-1"></i> Nuevo Comentario
+    </button>
+  </div>
+  <hr class="mb-4">
+
+  <!-- Mensajes de Estado -->
+  <div *ngIf="loading" class="alert alert-info mb-4">
+    <i class="fa-solid fa-spinner fa-spin me-2"></i> Cargando registros...
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-danger mb-4">
+    <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ errorMessage }}
+  </div>
+
+  <!-- Contenedor con Estilo Glass para la Tabla -->
+  <div *ngIf="!loading && !errorMessage && comments.length > 0" class="glass-table-container">
+    <div class="table-responsive">
+      <table class="table table-dark table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Usuario</th>
+            <th>Comentario</th>
+            <th>Valoración</th>
+            <th>ID Estadía</th>
+            <th>Fecha</th>
+            <th *ngIf="isAdminOrRecepcionist" class="text-end">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let comment of comments">
+            <td><strong class="text-subtitle">#{{ comment.id }}</strong></td>
+            <td>
+              <div *ngIf="comment.user">
+                <div class="text-main fw-medium">{{ comment.user.name }} {{ comment.user.surname }}</div>
+                <small class="text-subtitle">{{ comment.user.email }}</small>
+              </div>
+              <span *ngIf="!comment.user" class="text-subtitle">Desconocido</span>
+            </td>
+            <td>
+              <span class="comment-text" [title]="comment.content">{{ comment.content }}</span>
+            </td>
+            <td>
+              <span class="badge badge-warning-glass">
+                {{ comment.rating }} <i class="fa-solid fa-star ms-1"></i>
+              </span>
+            </td>
+            <td>
+              <span class="badge badge-secondary-glass">Check-in #{{ comment.checkInId }}</span>
+            </td>
+            <td>
+              <span class="text-subtitle small">{{ comment.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+            </td>
+            
+            <!-- Acciones restringidas -->
+            <td *ngIf="isAdminOrRecepcionist" class="text-end">
+              <div class="d-flex justify-content-end gap-1">
+                <button 
+                  class="btn btn-warning btn-sm" 
+                  [routerLink]="['/dashboard/comments/editar', comment.id]">
+                  <i class="fa-solid fa-pen-to-square"></i> Editar
+                </button>
+                <button 
+                  class="btn btn-danger btn-sm" 
+                  (click)="deleteComment(comment.id)">
+                  <i class="fa-solid fa-trash"></i> Eliminar
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Mensaje si la lista está vacía -->
+  <div *ngIf="!loading && !errorMessage && comments.length === 0" class="alert alert-warning text-center py-4">
+    <i class="fa-solid fa-circle-exclamation me-2"></i> No se encontraron comentarios registrados en el sistema.
+  </div>
+</div>

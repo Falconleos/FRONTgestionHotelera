@@ -1,0 +1,71 @@
+<div class="container mt-4 mb-5">
+  <div class="d-flex justify-content-between align-items-center mb-4 header-section">
+    <h2>
+      <i class="fa-solid fa-file-invoice-dollar me-2"></i> Gestión de Pagos Registrados
+    </h2>
+  </div>
+  <hr class="mb-4">
+
+  <!-- Mensajes de carga o error -->
+  <div *ngIf="loading" class="alert alert-info mb-4">
+    <i class="fa-solid fa-spinner fa-spin me-2"></i> Cargando registros de pagos...
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-danger mb-4">
+    <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ errorMessage }}
+  </div>
+
+  <!-- Tabla de datos con efecto Glass -->
+  <div class="table-responsive" *ngIf="!loading && !errorMessage && payments.length > 0">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th>ID Pago</th>
+          <th>Huésped (Nombre y Apellido)</th>
+          <th>Registrado por</th>
+          <th>ID Cuenta</th>
+          <th>Monto ($)</th>
+          <th>Fecha y Hora</th>
+          <th>Método de Pago</th>
+          <th>Referencia / Transacción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let payment of payments">
+          <td><strong>#{{ payment.id }}</strong></td>
+          <td>
+            <span *ngIf="payment.userName || payment.userSurname; else noUser">
+              {{ payment.userName }} {{ payment.userSurname }}
+            </span>
+            <ng-template #noUser>-</ng-template>
+          </td>
+          <td>
+            <span *ngIf="payment.registeredByName || payment.registeredBySurname; else noRegistrar">
+              {{ payment.registeredByName }} {{ payment.registeredBySurname }}
+            </span>
+            <ng-template #noRegistrar>-</ng-template>
+          </td>
+          <td>
+            <span class="badge bg-secondary">
+              <i class="fa-solid fa-wallet me-1"></i> Cuenta #{{ payment.accountId }}
+            </span>
+          </td>
+          <td class="text-success fw-bold">
+            ${{ payment.amount | number:'1.2-2' }}
+          </td>
+          <td>{{ payment.paymentDate | date:'medium' }}</td>
+          <td>
+            <span class="badge bg-info">
+              <i class="fa-solid fa-credit-card me-1"></i> {{ payment.paymentMethod || 'N/D' }}
+            </span>
+          </td>
+          <td>{{ payment.transactionReference || 'Sin referencia' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Mensaje si la lista está vacía -->
+  <div *ngIf="!loading && !errorMessage && payments.length === 0" class="alert alert-warning">
+    <i class="fa-solid fa-circle-info me-2"></i> No se encontraron pagos registrados en el sistema.
+  </div>
+</div>

@@ -1,0 +1,203 @@
+:host {
+  background-color: transparent !important;
+  display: block;
+  min-height: 100vh;
+}
+
+.container {
+  padding: 4px;
+}
+
+.container h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #f8fafc;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.container h2 i {
+  color: #818cf8;
+}
+
+.text-subtitle {
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+.text-main {
+  color: #f8fafc;
+  font-size: 0.95rem;
+}
+
+.container hr {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* --- Contenedor de Tabla con Glassmorphism --- */
+.glass-table-container {
+  background: rgba(15, 23, 42, 0.65);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.table {
+  color: #f8fafc;
+  margin-bottom: 0;
+  background-color: transparent !important;
+}
+
+.table > thead {
+  background: rgba(15, 23, 42, 0.9) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.table > thead th {
+  color: #cbd5e1;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 1rem 1.25rem;
+  border-bottom: none;
+  background-color: transparent !important;
+}
+
+.table > tbody td {
+  padding: 1rem 1.25rem;
+  color: #f8fafc;
+  border-color: rgba(255, 255, 255, 0.05);
+  background-color: transparent !important;
+  vertical-align: middle;
+}
+
+.table-hover > tbody > tr:hover > * {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  color: #ffffff;
+}
+
+.comment-text {
+  display: inline-block;
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #cbd5e1;
+  font-size: 0.9rem;
+}
+
+/* --- Badges Translúcidos --- */
+.badge {
+  font-weight: 500;
+  font-size: 0.75rem;
+  padding: 0.4em 0.65em;
+  border-radius: 6px;
+}
+
+.badge-warning-glass {
+  background: rgba(245, 158, 11, 0.15) !important;
+  color: #fcd34d !important;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  font-size: 0.85rem;
+}
+
+.badge-secondary-glass {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #cbd5e1 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* --- Botones --- */
+.btn {
+  font-weight: 500;
+  font-size: 0.8rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  padding: 0.4rem 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.btn-primary {
+  background: rgba(59, 130, 246, 0.25);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  color: #93c5fd;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: rgba(59, 130, 246, 0.4);
+  color: #ffffff;
+  border-color: rgba(59, 130, 246, 0.6);
+}
+
+.btn-warning {
+  background: rgba(245, 158, 11, 0.25);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fcd34d;
+}
+
+.btn-warning:hover:not(:disabled) {
+  background: rgba(245, 158, 11, 0.4);
+  color: #ffffff;
+  border-color: rgba(245, 158, 11, 0.6);
+}
+
+.btn-danger {
+  background: rgba(239, 68, 68, 0.25);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.4);
+  color: #ffffff;
+  border-color: rgba(239, 68, 68, 0.6);
+}
+
+/* --- Alertas Glass --- */
+.alert-danger {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.alert-info {
+  background: rgba(59, 130, 246, 0.15);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.alert-warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fcd34d;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}

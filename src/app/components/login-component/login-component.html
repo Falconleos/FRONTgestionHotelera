@@ -1,0 +1,59 @@
+<div class="login-container">
+  <div class="login-card">
+    
+    <!-- Botón para volver a la landing -->
+    <a routerLink="/" class="btn-back">
+      <i class="fa-solid fa-arrow-left"></i> Volver
+    </a>
+
+    <h2><i class="fa-solid fa-hotel"></i> <span>Ultimate Hotel Software</span></h2>
+    <p class="subtitle">Inicia sesión para continuar</p>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      
+      <!-- Campo Usuario -->
+      <div class="field-spacing">
+        <label for="username" class="form-label">Usuario</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+          <input 
+            id="username" 
+            type="text" 
+            class="form-control"
+            formControlName="username" 
+            placeholder="Ingresa tu usuario"
+            required
+          />
+        </div>
+      </div>
+
+      <!-- Campo Contraseña -->
+      <div class="field-spacing">
+        <label for="password" class="form-label">Contraseña</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+          <input 
+            id="password" 
+            type="password" 
+            class="form-control"
+            formControlName="password" 
+            placeholder="Ingresa tu contraseña"
+            required
+          />
+        </div>
+      </div>
+
+      <!-- Alerta de Error Glass -->
+      <div *ngIf="errorMessage" class="alert alert-danger field-spacing">
+        <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ errorMessage }}
+      </div>
+
+      <!-- Botón de Ingreso con separación superior extra -->
+      <button type="submit" [disabled]="loginForm.invalid || loading" class="btn btn-primary w-100 btn-submit-spacing">
+        <i class="fa-solid" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-right-to-bracket'" *ngIf="loading"></i>
+        {{ loading ? 'Ingresando...' : 'Entrar' }}
+      </button>
+
+    </form>
+  </div>
+</div>

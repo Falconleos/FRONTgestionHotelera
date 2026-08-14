@@ -1,0 +1,185 @@
+<div class="container mt-4 mb-5" *ngIf="!loading && account">
+  <div class="d-flex justify-content-between align-items-center mb-4 header-section">
+    <h2>
+      <i class="fa-solid fa-file-invoice me-2">&nbsp;</i> Resumen de Cuenta <span class="text-subtitle font-monospace">#{{ checkInId }}</span>
+    </h2>
+    <button class="btn btn-secondary btn-sm" (click)="goBack()">
+      <i class="fa-solid fa-arrow-left me-1"></i> Volver a Check-Ins
+    </button>
+  </div>
+  <hr class="mb-4">
+
+  <!-- Mensaje de error si ocurre -->
+  <div *ngIf="errorMessage" class="alert alert-danger mb-4">
+    <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ errorMessage }}
+  </div>
+
+  <div class="row g-4 ">
+    <!-- Columna Izquierda: Desglose, Ajuste y Totales (Ocupa 7 columnas) -->
+    <div class="col-lg-7 ">
+      <!-- Desglose de Cargos -->
+      <div class="glass-card mb-4 contentPadding">
+        <div class="glass-card-header">
+          <i class="fa-solid fa-list-check me-2"></i> Desglose de Cargos
+        </div>
+        <div class="card-body p-4">
+          <div class="table-responsive mb-3">
+            <table class="table align-middle contentMargin">
+              <thead>
+                <tr>
+                  <th>Concepto</th>
+                  <th class="text-end">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Estadía base -->
+                <tr>
+                  <td>
+                    <i class="fa-solid fa-bed me-2 text-indigo"></i> Estadía base
+                  </td>
+                  <td class="text-end fw-semibold">${{ account.baseAmount | number:'1.2-2' }}</td>
+                </tr>
+                <!-- Servicios adicionales e ítems uno por uno -->
+                <tr *ngFor="let item of account.items">
+                  <td>
+                    <i class="fa-solid fa-plus-circle me-2 text-muted"></i> {{ item.description }} 
+                    <span class="badge bg-secondary ms-1">x{{ item.quantity }}</span>
+                  </td>
+                  <td class="text-end fw-semibold">${{ item.subtotal | number:'1.2-2' }}</td>
+                </tr>
+                <!-- Fila de Ajuste por Porcentaje (si es diferente de 0) -->
+                <tr *ngIf="adjustmentPercentage !== 0">
+                  <td>
+                    Ajuste por porcentaje 
+                    <span class="badge ms-2" [ngClass]="adjustmentPercentage > 0 ? 'bg-warning' : 'bg-info'">
+                      {{ adjustmentPercentage > 0 ? '+' + adjustmentPercentage + '%' : adjustmentPercentage + '%' }}
+                    </span>
+                  </td>
+                  <td class="text-end fw-semibold" [ngClass]="adjustmentPercentage > 0 ? 'text-danger' : 'text-success'">
+                    {{ adjustmentPercentage > 0 ? '+' : '' }}${{ calculateAdjustmentAmount() | number:'1.2-2' }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <hr class="my-4 border-secondary opacity-25">
+
+          <!-- Control Unificado de Ajuste -->
+          <div class="glass-subcard p-3 mb-4 contentPadding">
+            <div class="row g-3 align-items-end">
+              <div class="col-md-8">
+                <label class="form-label">Ajuste (%) <span class="text-muted fw-normal">(Usa '-' para descuento, ej: -10)</span></label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="fa-solid fa-percent"></i></span>
+                  <input type="number" class="form-control inputExtra" [(ngModel)]="adjustmentPercentage" [disabled]="account.isPaid" placeholder="Ej: 21 o -10">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <button class="btn btn-primary w-100" (click)="applyAdjustments()" [disabled]="account.isPaid">
+                  <i class="fa-solid fa-check me-1"></i> Aplicar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Totales -->
+          <div class="d-flex justify-content-between align-items-center mb-2 contentMargin">
+            <span class="text-muted fw-semibold">Total General Ajustado:</span>
+            <h4 class="text-white fw-bold mb-0">${{ calculateAdjustedTotal() | number:'1.2-2' }}</h4>
+          </div>
+          
+          <div class="d-flex justify-content-between align-items-center mb-3 contentMargin">
+            <span class="text-muted fw-semibold">Restante a pagar:</span>
+            <h4 [ngClass]="calculateRemaining() === 0 ? 'text-success' : 'text-danger'" class="fw-bold mb-0">
+              ${{ calculateRemaining() | number:'1.2-2' }}
+            </h4>
+          </div>
+
+          <div class="mt-3">
+            <span class="badge px-3 py-2 fs-6" [ngClass]="account.isPaid ? 'bg-success' : 'bg-warning'">
+              <i class="fa-solid" [ngClass]="account.isPaid ? 'fa-circle-check' : 'fa-clock'">&nbsp;</i>
+              Estado: {{ account.isPaid ? 'Pagada' : 'Impago' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Historial de Pagos -->
+      <div class="glass-card contentMarginUpDown">
+        <div class="glass-card-header contentMargin">
+          <i class="fa-solid fa-clock-rotate-left me-2">&nbsp;</i> Historial de Pagos
+        </div>
+        <div class="card-body p-4">
+          <ul class="list-group list-group-flush bg-transparent" *ngIf="account.payments && account.payments.length > 0; else noPayments">
+            <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-3 bg-transparent text-white border-bottom border-secondary border-opacity-25" *ngFor="let p of account.payments">
+              <div>
+                <strong class="text-success fs-5 contentPaddingRight">${{ p.amount | number:'1.2-2' }}</strong> 
+                <span class="badge bg-info ms-2"><i class="fa-solid fa-credit-card me-1">&nbsp;</i> {{ p.paymentMethod }}</span>
+                <br><small class="text-muted"><i class="fa-regular fa-calendar me-1"></i> {{ p.paymentDate }} | Ref: {{ p.transactionReference || 'N/A' }}</small>
+              </div>
+            </li>
+          </ul>
+          <ng-template #noPayments>
+            <p class="text-muted mb-0"><i class="fa-solid fa-circle-info me-2"></i> No hay pagos registrados todavía.</p>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna Derecha: Formulario para Registrar Pago (Ocupa 5 columnas) -->
+    <div class="col-lg-5">
+      <div class="glass-form h-100">
+        <div class="d-flex align-items-center mb-4">
+          <div class="header-icon-container me-3">
+            <i class="fa-solid fa-cash-register text-success fs-4"></i>
+          </div>
+          <h4 class="text-white mb-0 fw-bold fs-5">Registrar Pago</h4>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label">Monto a Pagar ($) *</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fa-solid fa-dollar-sign"></i></span>
+            <input type="number" class="form-control inputExtra" [(ngModel)]="paymentAmount" [disabled]="account.isPaid">
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label">Método de Pago *</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fa-solid fa-wallet"></i></span>
+            <select class="form-control custom-select inputExtra" [(ngModel)]="paymentMethod" [disabled]="account.isPaid">
+              <option value="CASH">Efectivo</option>
+              <option value="CREDIT_CARD">Tarjeta de Crédito</option>
+              <option value="DEBIT_CARD">Tarjeta de Débito</option>
+              <option value="TRANSFER">Transferencia</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label">Referencia / Comprobante</label>
+          <div class="input-group">
+            <span class="input-group-text "><i class="fa-solid fa-receipt"></i></span>
+            <input type="text" class="form-control inputExtra" [(ngModel)]="transactionReference" placeholder="Ej: Transacción #1234" [disabled]="account.isPaid">
+          </div>
+        </div>
+
+        <button 
+          class="btn btn-success w-100 py-3 fw-bold" 
+          (click)="submitPayment()" 
+          [disabled]="account.isPaid || calculateRemaining() === 0 || checkInState === 'INTERRUPTED' || checkInState === 'COMPLETED'">
+          <i class="fa-solid fa-circle-check me-2"></i> Procesar Pago
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Indicador de Carga Inicial -->
+<div *ngIf="loading" class="container mt-4">
+  <div class="alert alert-info">
+    <i class="fa-solid fa-spinner fa-spin me-2"></i> Cargando detalles de la cuenta...
+  </div>
+</div>

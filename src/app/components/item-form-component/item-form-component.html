@@ -1,0 +1,106 @@
+<div class="container mt-4 mb-5" style="max-width: 600px;">
+  <div class="d-flex justify-content-between align-items-center">
+    <h2>
+      <i class="fa-solid" [ngClass]="isEditMode ? 'fa-pen-to-square' : 'fa-circle-plus'"></i>
+      {{ isEditMode ? 'Editar Ítem' : 'Crear Nuevo Ítem' }}
+    </h2>
+    <!-- Indicador visual claro del tipo seleccionado con estilo glass -->
+    <span class="badge px-3 py-2" [ngClass]="item.isService ? 'badge-info-glass' : 'badge-secondary-glass'">
+      {{ item.isService ? 'Modo: Servicio (Cant. fija)' : 'Modo: Ítem Estándar' }}
+    </span>
+  </div>
+  <p class="text-subtitle mb-4">
+    {{ isEditMode ? 'Modifica los datos del ítem o servicio seleccionado.' : 'Completa la información para registrar un nuevo ítem o servicio.' }}
+  </p>
+  <hr class="mb-4">
+
+  <!-- Mensajes de Estado -->
+  <div *ngIf="errorMessage" class="alert alert-danger mb-4">
+    <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ errorMessage }}
+  </div>
+  <div *ngIf="successMessage" class="alert alert-success mb-4">
+    <i class="fa-solid fa-circle-check me-2"></i> {{ successMessage }}
+  </div>
+  <div *ngIf="loading && isEditMode" class="alert alert-info mb-4">
+    <i class="fa-solid fa-spinner fa-spin me-2"></i> Cargando datos del ítem...
+  </div>
+
+  <!-- Formulario Principal con Estilo Glass -->
+  <form (ngSubmit)="onSubmit()" *ngIf="!loading || !isEditMode" class="glass-form">
+    
+    <!-- Checkbox para Servicio -->
+    <div class="mb-4 form-check custom-checkbox-container">
+      <input 
+        type="checkbox" 
+        id="isService" 
+        class="form-check-input" 
+        [(ngModel)]="item.isService" 
+        name="isService"
+        (change)="onServiceChange()">
+      <label class="form-check-label fw-bold text-main" for="isService">
+        ¿Es un servicio? <span class="text-subtitle fw-normal">(La cantidad será fija en 1)</span>
+      </label>
+    </div>
+
+    <div class="mb-4">
+      <label for="description" class="form-label">Descripción *</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="fa-solid fa-align-left"></i></span>
+        <input 
+          type="text" 
+          id="description" 
+          class="form-control inputExtra" 
+          [(ngModel)]="item.description" 
+          name="description" 
+          required 
+          placeholder="Ej. Tasa de limpieza, Lavandería...">
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label for="quantity" class="form-label">Cantidad *</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="fa-solid fa-sort-numeric-up"></i></span>
+        <input 
+          type="number" 
+          id="quantity" 
+          class="form-control inputExtra" 
+          [(ngModel)]="item.quantity" 
+          name="quantity" 
+          min="1" 
+          [disabled]="!!item.isService"
+          required>
+      </div>
+      <div *ngIf="item.isService" class="form-text text-subtitle small mt-1">
+        <i class="fa-solid fa-info-circle me-1"></i> Al ser un servicio, la cantidad está bloqueada en 1 de forma permanente.
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label for="unitPrice" class="form-label">Precio Unitario ($) *</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="fa-solid fa-dollar-sign"></i></span>
+        <input 
+          type="number" 
+          id="unitPrice" 
+          class="form-control inputExtra" 
+          [(ngModel)]="item.unitPrice" 
+          name="unitPrice" 
+          step="0.01" 
+          min="0.01" 
+          required>
+      </div>
+    </div>
+
+    <!-- Botones de Acción -->
+    <div class="form-actions-container">
+      <button type="button" class="btn btn-secondary" routerLink="/dashboard/items">
+        <i class="fa-solid fa-arrow-left me-1"></i> Cancelar
+      </button>
+      <button type="submit" class="btn btn-success" [disabled]="loading">
+        <i class="fa-solid" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-check'"></i> 
+        {{ loading ? 'Guardando...' : (isEditMode ? 'Actualizar Ítem' : 'Crear Ítem') }}
+      </button>
+    </div>
+  </form>
+</div>

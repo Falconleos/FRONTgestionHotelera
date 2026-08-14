@@ -1,0 +1,76 @@
+<div class="container mt-4 mb-5">
+  <div class="d-flex justify-content-between align-items-center mb-4 header-section">
+    <h2>
+      <i class="fa-solid fa-file-invoice-dollar me-2"></i> Gestión de Cuentas y Pagos
+    </h2>
+  </div>
+  <hr class="mb-4">
+
+  <!-- Mensajes de carga o error -->
+  <div *ngIf="loading" class="alert alert-info mb-4">
+    <i class="fa-solid fa-spinner fa-spin me-2"></i> Cargando registros...
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-danger mb-4">
+    <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ errorMessage }}
+  </div>
+
+  <!-- Tabla de datos con efecto Glass y scroll horizontal optimizado -->
+  <div class="table-responsive" *ngIf="!loading && !errorMessage && accounts.length > 0">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>ID Cuenta</th>
+          <th>Huésped</th>
+          <th>DNI</th>
+          <th>Nº Habitación</th>
+          <th>Período</th>
+          <th>Total ($)</th>
+          <th>Pagado ($)</th>
+          <th>Saldo ($)</th>
+          <th>Estado</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let account of accounts">
+          <td><strong>#{{ account.id }}</strong></td>
+          <td class="text-nowrap">{{ account.user ? (account.user.name + ' ' + account.user.surname) : '-' }}</td>
+          <td>{{ account.user?.dni || '-' }}</td>
+          <td>
+            <span class="badge bg-secondary">
+              <i class="fa-solid fa-bed me-1"></i> Hab. {{ account.roomNumber || 'N/D' }}
+            </span>
+          </td>
+          <td class="text-nowrap">
+            <small class="text-muted-date">
+              <i class="fa-regular fa-calendar-days me-1"></i> {{ account.checkInDate || 'N/D' }} al {{ account.checkOutDate || 'N/D' }}
+            </small>
+          </td>
+          <td class="fw-bold text-nowrap">${{ account.totalAmount | number:'1.2-2' }}</td>
+          <td class="text-success fw-bold text-nowrap">${{ account.paidAmount | number:'1.2-2' }}</td>
+          <td class="text-danger fw-bold text-nowrap">${{ account.remainingBalance | number:'1.2-2' }}</td>
+          <td>
+            <span class="badge" [ngClass]="account.isPaid ? 'bg-success' : 'bg-warning'">
+              <i class="fa-solid" [ngClass]="account.isPaid ? 'fa-circle-check' : 'fa-clock'"></i>
+              {{ account.isPaid ? 'Pagado' : 'Pendiente' }}
+            </span>
+          </td>
+          <td class="text-center text-nowrap">
+            <!-- Botón de acción con estilo Glass -->
+            <button 
+              class="btn btn-primary btn-sm" 
+              [routerLink]="['/dashboard/check-ins', account.checkInId, 'cuenta']"
+              title="Ver detalle de cuenta">
+              <i class="fa-solid fa-eye"></i> Ver Detalle
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Mensaje si la lista está vacía -->
+  <div *ngIf="!loading && !errorMessage && accounts.length === 0" class="alert alert-warning">
+    <i class="fa-solid fa-circle-info me-2"></i> No se encontraron cuentas registradas.
+  </div>
+</div>

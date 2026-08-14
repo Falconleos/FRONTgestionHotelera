@@ -1,0 +1,103 @@
+<div class="container mt-4">
+  <h2><i class="fa-solid fa-user-tie me-2"></i> Nuevo Empleado</h2>
+  <p class="text-subtitle mb-4">Ingrese los datos correspondientes para registrar un nuevo empleado en el sistema. Los campos con (*) son obligatorios.</p>
+  <hr class="mb-4">
+
+  <div *ngIf="errorMessage" class="alert alert-danger mb-4">
+    <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ errorMessage }}
+  </div>
+
+  <form (ngSubmit)="onSubmit()" #employeeForm="ngForm" class="glass-form">
+    
+    <!-- Información de Cuenta y Personal -->
+    <h4 class="form-section-title">Información de Cuenta y Personal</h4>
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <label for="username" class="form-label">Nombre de Usuario *</label>
+        <input type="text" class="form-control" id="username" name="username" [(ngModel)]="formData.username" required #username="ngModel" placeholder="ej. jperez">
+        <div *ngIf="username.invalid && (username.dirty || username.touched)" class="text-danger small mt-1">
+          El nombre de usuario es obligatorio.
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <label for="password" class="form-label">Contraseña Temporal *</label>
+        <input type="password" class="form-control" id="password" name="password" [(ngModel)]="formData.password" required #password="ngModel" placeholder="••••••••">
+        <div *ngIf="password.invalid && (password.dirty || password.touched)" class="text-danger small mt-1">
+          La contraseña es obligatoria.
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <label for="name" class="form-label">Nombre *</label>
+        <input type="text" class="form-control" id="name" name="name" [(ngModel)]="formData.name" required minlength="3" maxlength="50" #name="ngModel" placeholder="Juan">
+      </div>
+
+      <div class="col-md-6">
+        <label for="surname" class="form-label">Apellido *</label>
+        <input type="text" class="form-control" id="surname" name="surname" [(ngModel)]="formData.surname" required minlength="3" maxlength="50" #surname="ngModel" placeholder="Pérez">
+      </div>
+
+      <div class="col-md-4">
+        <label for="dni" class="form-label">DNI *</label>
+        <input type="text" class="form-control" id="dni" name="dni" [(ngModel)]="formData.dni" required pattern="\d{7,10}" #dni="ngModel" placeholder="12345678">
+      </div>
+
+      <div class="col-md-4">
+        <label for="email" class="form-label">Correo Electrónico *</label>
+        <input type="email" class="form-control" id="email" name="email" [(ngModel)]="formData.email" required email #email="ngModel" placeholder="juan@example.com">
+      </div>
+
+      <div class="col-md-4">
+        <label for="phoneNumber" class="form-label">Teléfono *</label>
+        <input type="text" class="form-control" id="phoneNumber" name="phoneNumber" [(ngModel)]="formData.phoneNumber" required #phone="ngModel" placeholder="+54 9 11...">
+      </div>
+
+      <div class="col-md-6">
+        <label for="birthDay" class="form-label">Fecha de Nacimiento</label>
+        <input type="date" class="form-control" id="birthDay" name="birthDay" [(ngModel)]="formData.birthDay">
+      </div>
+
+      <div class="col-md-6">
+        <label for="role" class="form-label">Rol del Sistema *</label>
+        <select class="form-select" id="role" name="role" [(ngModel)]="formData.role" required>
+          <option value="" disabled selected>Seleccione un rol...</option>
+          <option *ngFor="let r of availableRoles" [value]="r">{{ r }}</option>
+        </select>
+      </div>
+    </div>
+
+    <hr class="section-divider mb-4">
+
+    <!-- Información Laboral -->
+    <h4 class="form-section-title">Información Laboral</h4>
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <label for="shift" class="form-label">Turno *</label>
+        <select class="form-select" id="shift" name="shift" [(ngModel)]="formData.shift" required>
+          <option value="" disabled selected>Seleccione un turno...</option>
+          <option *ngFor="let s of availableShifts" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+
+      <div class="col-md-6">
+        <label for="salary" class="form-label">Salario ($) *</label>
+        <input type="number" step="0.01" class="form-control" id="salary" name="salary" [(ngModel)]="formData.salary" required min="1" #salary="ngModel" placeholder="0.00">
+      </div>
+    </div>
+
+    <hr class="section-divider mb-4">
+
+    <!-- Botones de acción (Alineados a la derecha de forma prolija) -->
+    <div class="form-actions-container">
+      <button type="button" class="btn btn-secondary" routerLink="/dashboard/employees">
+        Cancelar
+      </button>
+      <button type="submit" class="btn btn-success" [disabled]="employeeForm.invalid || loading">
+        <i class="fa-solid" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-check'"></i> 
+        {{ loading ? 'Guardando...' : 'Crear Empleado' }}
+      </button>
+    </div>
+
+  </form>
+</div>
