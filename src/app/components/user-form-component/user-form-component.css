@@ -65,11 +65,32 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #f8fafc;
   border-radius: 10px;
-  padding: 0.55rem 0.9rem; /* Padding vertical equilibrado */
-  height: 42px; /* Altura fija estándar y prolija para los textbox */
+  padding: 0.55rem 0.9rem;
+  height: 42px;
   font-size: 0.95rem;
   transition: all 0.3s ease;
   width: 100%;
+}
+
+/* Ajuste específico para el input file */
+.file-input {
+  padding-top: 0.4rem;
+  color: #94a3b8;
+}
+
+.file-input::file-selector-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #f8fafc;
+  padding: 4px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 12px;
+  transition: background 0.2s ease;
+}
+
+.file-input::file-selector-button:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .form-control::placeholder {
@@ -91,17 +112,16 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
   cursor: pointer;
 }
 
-/* Contenedor de botones prolijo, alineado a la derecha y separado */
+/* Contenedor de botones prolijo */
 .form-actions-container {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 12px; /* Espacio limpio entre ambos botones */
+  gap: 12px;
   margin-top: 2rem;
   padding-top: 1rem;
 }
 
-/* Botones personalizados con dimensiones estables */
 .btn {
   font-weight: 600;
   font-size: 0.9rem;
@@ -112,7 +132,7 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
   justify-content: center;
   gap: 8px;
   padding: 0.55rem 1.4rem;
-  height: 42px; /* Misma altura que los inputs para perfecta armonía visual */
+  height: 42px;
 }
 
 .btn-secondary {
@@ -143,7 +163,7 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
 }
 
-/* Alerta de error con estilo Glass */
+/* Alerta de error */
 .alert-danger {
   background: rgba(239, 68, 68, 0.15);
   color: #fca5a5;

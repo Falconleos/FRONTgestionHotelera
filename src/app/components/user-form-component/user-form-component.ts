@@ -10,7 +10,7 @@ import { UserDtoRequestCreation, RoleType } from '../../models/user-creation.mod
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './user-form-component.html',
-  styleUrls: ['./user-form-component.css'] // <-- Agrega esta línea (o styleUrl según tu versión de Angular)
+  styleUrls: ['./user-form-component.css']
 })
 export class UserFormComponent {
   formData = {
@@ -19,10 +19,12 @@ export class UserFormComponent {
     name: '',
     surname: '',
     dni: '',
+    gender: '', // <-- Agregado campo de género
     email: '',
     phoneNumber: '',
     birthDay: '',
-    role: 'GUEST' as RoleType
+    role: 'GUEST' as RoleType,
+    profilePictureFile: undefined as File | undefined
   };
 
   loading = false;
@@ -34,6 +36,13 @@ export class UserFormComponent {
     private cdr: ChangeDetectorRef
   ) {}
 
+  onFileSelected(event: any): void {
+    const file: File = event.target.files[0];
+    if (file) {
+      this.formData.profilePictureFile = file;
+    }
+  }
+
   onSubmit(): void {
     this.errorMessage = '';
     this.loading = true;
@@ -44,10 +53,12 @@ export class UserFormComponent {
       name: this.formData.name,
       surname: this.formData.surname,
       dni: this.formData.dni,
+      gender: this.formData.gender, // <-- Incluido en el payload
       email: this.formData.email,
       phoneNumber: this.formData.phoneNumber,
       birthDay: this.formData.birthDay ? this.formData.birthDay : undefined,
-      role: this.formData.role
+      role: this.formData.role,
+      profilePictureFile: this.formData.profilePictureFile
     };
 
     this.userService.createUser(payload).subscribe({
@@ -58,8 +69,9 @@ export class UserFormComponent {
       },
       error: (err) => {
         this.loading = false;
-        this.errorMessage = err.error?.message || 'Error al registrar el usuario en el sistema. Verifique los datos o si el username/email/DNI ya existen.';
+        this.errorMessage = err.error?.mensaje || err.error?.message || 'Error al registrar el usuario en el sistema. Verifique los datos o si el username/email/DNI ya existen.';
         this.cdr.markForCheck();
+        alert(this.errorMessage);
         console.error(err);
       }
     });

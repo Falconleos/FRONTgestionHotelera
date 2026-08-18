@@ -13,4 +13,5 @@ export interface UserDtoRequestCreation {
   address?: string;
   birthDay?: string; // Formato 'yyyy-MM-dd' (requerido por @NotNull en Java)
   role: RoleType;   // Requerido por @NotNull en Java
+  profilePictureFile?: File; // <-- NUEVO CAMPO AGREGADO (Archivo de la imagen)
 }

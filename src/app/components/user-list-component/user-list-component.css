@@ -24,7 +24,7 @@
   border-color: rgba(255, 255, 255, 0.08);
 }
 
-/* Contenedor de la tabla con efecto Glass */
+/* Contenedor de la tabla con efecto Glass y scroll horizontal */
 .table-responsive {
   background: rgba(15, 23, 42, 0.65);
   -webkit-backdrop-filter: blur(16px);
@@ -32,7 +32,9 @@
   border-radius: 16px;
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  overflow: hidden;
+  overflow-x: auto; /* <-- Habilita la barra de desplazamiento horizontal */
+  -webkit-overflow-scrolling: touch; /* Mejora la fluidez del scroll en táctiles */
+  max-width: 100%;
 }
 
 .table {
@@ -40,6 +42,8 @@
   margin-bottom: 0;
   vertical-align: middle;
   color: #f8fafc;
+  width: 100%;
+  white-space: nowrap; /* <-- Evita que los textos largos se rompan en varias líneas */
 }
 
 .table thead {

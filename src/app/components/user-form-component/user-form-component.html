@@ -43,6 +43,17 @@
         <input type="text" id="dni" class="form-control" name="dni" [(ngModel)]="formData.dni" required #dni="ngModel" placeholder="12345678">
       </div>
 
+      <!-- Campo de Género Añadido -->
+      <div class="col-md-6">
+        <label for="gender" class="form-label">Gender</label>
+        <select id="gender" class="form-control" name="gender" [(ngModel)]="formData.gender">
+          <option value="" disabled selected>Seleccione género</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Femenino">Femenino</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+
       <div class="col-md-6">
         <label for="birthDay" class="form-label">Date of Birth</label>
         <input type="date" id="birthDay" class="form-control" name="birthDay" [(ngModel)]="formData.birthDay">
@@ -67,7 +78,18 @@
 
     <hr class="section-divider mb-4">
 
-    <!-- Actions (Correctly aligned and spaced buttons) -->
+    <!-- Profile Picture Section -->
+    <h4 class="form-section-title">Profile Picture (Optional)</h4>
+    <div class="row g-3 mb-4">
+      <div class="col-md-12">
+        <label for="profilePicture" class="form-label">Upload Image (JPG, PNG - Max 2MB)</label>
+        <input type="file" id="profilePicture" class="form-control file-input" (change)="onFileSelected($event)" accept="image/png, image/jpeg, image/jpg">
+      </div>
+    </div>
+
+    <hr class="section-divider mb-4">
+
+    <!-- Actions -->
     <div class="form-actions-container">
       <button type="button" class="btn btn-secondary" routerLink="/dashboard/usuarios">
         Cancel

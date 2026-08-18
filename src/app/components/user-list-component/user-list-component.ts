@@ -38,12 +38,14 @@ export class UserListComponent implements OnInit {
         const roles = JSON.parse(storedRoles);
         if (Array.isArray(roles)) {
           this.canModify = roles.some((r: any) => {
-            const val = typeof r === 'string' ? r : (r.authority || '');
-            return val === 'ADMIN' || val === 'ROLE_ADMIN' || val === 'RECEPCIONIST' || val === 'ROLE_RECEPCIONIST';
+            const val = typeof r === 'string' ? r : (r.authority || r.role || r.name || '');
+            const upperVal = val.toUpperCase();
+            return upperVal === 'ADMIN' || upperVal === 'ROLE_ADMIN' || upperVal === 'RECEPCIONIST' || upperVal === 'ROLE_RECEPCIONIST';
           });
         } else {
           const val = typeof roles === 'string' ? roles : '';
-          this.canModify = val === 'ADMIN' || val === 'ROLE_ADMIN' || val === 'RECEPCIONIST' || val === 'ROLE_RECEPCIONIST';
+          const upperVal = val.toUpperCase();
+          this.canModify = upperVal === 'ADMIN' || upperVal === 'ROLE_ADMIN' || upperVal === 'RECEPCIONIST' || upperVal === 'ROLE_RECEPCIONIST';
         }
       } catch (e) {
         this.canModify = storedRoles.includes('ADMIN') || storedRoles.includes('RECEPCIONIST');
@@ -57,20 +59,15 @@ export class UserListComponent implements OnInit {
     this.loading = true;
     this.errorMessage = '';
     
-    this.userService.getAll().subscribe({
+    // Llamamos al nuevo endpoint filtrado por el backend
+    this.userService.getByRole('GUEST').subscribe({
       next: (data) => {
-        const allUsers = Array.isArray(data) ? [...data] : [];
-        
-        // Filtramos para mantener únicamente a los usuarios que tengan el rol GUEST
-        this.users = allUsers.filter(user => 
-          user.roles && user.roles.some(role => role.name === 'GUEST')
-        );
-
+        this.users = Array.isArray(data) ? data : [];
         this.loading = false;
         this.cdr.markForCheck();
       },
       error: (err) => {
-        this.errorMessage = 'No se pudieron cargar los usuarios o no cuentas con los permisos necesarios.';
+        this.errorMessage = 'No se pudieron cargar los huéspedes.';
         this.loading = false;
         this.cdr.markForCheck();
         console.error(err);
