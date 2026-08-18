@@ -24,13 +24,13 @@
     <table class="table table-hover align-middle">
       <thead>
         <tr>
-          <th>ID</th>
+          <th class="text-center" style="width: 80px;">Foto</th>
           <th>Username</th>
           <th>Nombre y Apellido</th>
           <th>DNI</th>
           <th>Email</th>
           <th>Teléfono</th>
-          <th>Género</th> <!-- Nuevo campo alineado con el DTO -->
+          <th>Género</th>
           <th>Roles</th>
           <th>Estado</th>
           <th class="text-center">Acciones</th>
@@ -38,22 +38,30 @@
       </thead>
       <tbody>
         <tr *ngFor="let user of users">
-          <td>{{ user.id }}</td>
+          <td class="text-center">
+            <img 
+              [src]="user.profilePictureUrl || 'assets/default-avatar.png'" 
+              alt="Avatar" 
+              class="rounded-circle" 
+              width="40" 
+              height="40" 
+              style="object-fit: cover;">
+          </td>
           <td><strong>{{ user.username }}</strong></td>
           <td>{{ user.name }} {{ user.surname }}</td>
           <td>{{ user.dni }}</td>
           <td>{{ user.email }}</td>
           <td>{{ user.phoneNumber || '-' }}</td>
-          <td>{{ user.gender || '-' }}</td> <!-- Renderizado del género opcional -->
+          <td>{{ user.gender || '-' }}</td>
           <td>
-            <span *ngFor="let role of user.roles; let last = last" class="badge bg-secondary me-1">
-              <i class="fa-solid fa-shield-halved me-1"></i>
-              {{ role.role || role.roleName || role.name || role }}{{ !last ? ', ' : '' }}
-            </span>
+           <span *ngFor="let role of user.roles; let last = last" class="badge bg-secondary me-1">
+             <i class="fa-solid fa-shield-halved me-1">&nbsp;&nbsp;</i>
+             {{ role.name }}{{ !last ? ', ' : '' }}
+           </span>
           </td>
           <td>
             <span class="badge" [ngClass]="user.enabled ? 'bg-success' : 'bg-danger'">
-              <i class="fa-solid" [ngClass]="user.enabled ? 'fa-circle-check' : 'fa-circle-xmark'"></i>
+              <i class="fa-solid" [ngClass]="user.enabled ? 'fa-circle-check' : 'fa-circle-xmark'">&nbsp;&nbsp;</i>
               {{ user.enabled ? 'Activo' : 'Inactivo' }}
             </span>
           </td>

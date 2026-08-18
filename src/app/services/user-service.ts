@@ -79,4 +79,12 @@ private getHeaders(): HttpHeaders {
     'Authorization': token ? `Bearer ${token}` : ''
   });
 }
+
+// GET /private/user/{id}/profile-picture
+  getProfilePicture(id: number): Observable<Blob> {
+    return this.http.get<Blob>(`${this.apiUrl}/${id}/profile-picture`, {
+      withCredentials: true,
+      responseType: 'blob' as 'json'
+    });
+  }
 }
