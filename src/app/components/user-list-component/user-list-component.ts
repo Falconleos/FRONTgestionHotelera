@@ -19,6 +19,11 @@ export class UserListComponent implements OnInit {
   errorMessage = '';
   canModify = false;
 
+  // Almacena las URLs seguras creadas con blobs para cada ID de usuario
+  userAvatars: { [key: number]: string } = {};
+
+  selectedUser: UserDtoResponse | null = null;
+
   constructor(
     private userService: UserService,
     private authService: AuthService,
@@ -59,11 +64,16 @@ export class UserListComponent implements OnInit {
     this.loading = true;
     this.errorMessage = '';
     
-    // Llamamos al nuevo endpoint filtrado por el backend
     this.userService.getByRole('GUEST').subscribe({
       next: (data) => {
         this.users = Array.isArray(data) ? data : [];
         this.loading = false;
+        
+        // Precargamos los avatares para cada usuario de la lista
+        this.users.forEach(user => {
+          this.loadUserAvatar(user);
+        });
+
         this.cdr.markForCheck();
       },
       error: (err) => {
@@ -85,6 +95,7 @@ export class UserListComponent implements OnInit {
       this.userService.deleteUser(id).subscribe({
         next: () => {
           this.users = this.users.filter(user => user.id !== id);
+          delete this.userAvatars[id]; // Limpiamos la caché de la foto si se elimina
           this.cdr.markForCheck();
         },
         error: (err) => {
@@ -101,5 +112,49 @@ export class UserListComponent implements OnInit {
     } else {
       alert('No tienes los permisos necesarios.');
     }
+  }
+
+  // Métodos para controlar el modal:
+  openUserDetail(user: UserDtoResponse): void {
+    this.selectedUser = user;
+    this.loadUserAvatar(user);
+  }
+
+  closeUserDetail(): void {
+    this.selectedUser = null;
+  }
+
+  deleteUserModal(id: number): void {
+    this.closeUserDetail();
+    this.deleteUser(id);
+  }
+
+  // Carga la imagen mediante el servicio asegurando el envío del Token JWT
+  loadUserAvatar(user: UserDtoResponse): void {
+    if (!user || !user.id) return;
+
+    // Si ya fue cargada anteriormente o está cargando, evitamos solicitudes repetidas
+    if (this.userAvatars[user.id]) return;
+
+    this.userService.getProfilePicture(user.id).subscribe({
+      next: (blob) => {
+        const objectURL = URL.createObjectURL(blob);
+        this.userAvatars[user.id] = objectURL;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        console.error('Error al cargar la foto de perfil', err);
+        this.userAvatars[user.id] = 'assets/default-avatar.png';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  // Retorna la URL de objeto segura o la imagen por defecto
+  getUserAvatarUrl(user: UserDtoResponse | null): string {
+    if (!user || !user.id) {
+      return 'assets/default-avatar.png';
+    }
+    return this.userAvatars[user.id] || 'assets/default-avatar.png';
   }
 }

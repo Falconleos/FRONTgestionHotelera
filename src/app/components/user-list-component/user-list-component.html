@@ -1,4 +1,3 @@
-<!-- src/app/components/user-list-component/user-list-component.html -->
 <div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4 header-section">
     <h2><i class="fa-solid fa-users-gear me-2"></i> Gestión de Usuarios (Huéspedes)</h2>
@@ -19,68 +18,31 @@
     <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ errorMessage }}
   </div>
 
-  <!-- Tabla de datos -->
+  <!-- Tabla de datos con miniaturas, clickeable -->
   <div class="table-responsive" *ngIf="!loading && !errorMessage && users.length > 0">
-    <table class="table table-hover align-middle">
+    <table class="table table-hover align-middle cursor-pointer">
       <thead>
         <tr>
-          <th class="text-center" style="width: 80px;">Foto</th>
+          <th style="width: 60px;">Avatar</th>
           <th>Username</th>
           <th>Nombre y Apellido</th>
           <th>DNI</th>
-          <th>Email</th>
           <th>Teléfono</th>
-          <th>Género</th>
-          <th>Roles</th>
-          <th>Estado</th>
-          <th class="text-center">Acciones</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let user of users">
-          <td class="text-center">
-            <img 
-              [src]="user.profilePictureUrl || 'assets/default-avatar.png'" 
-              alt="Avatar" 
-              class="rounded-circle" 
-              width="40" 
-              height="40" 
-              style="object-fit: cover;">
+        <tr *ngFor="let user of users" (click)="openUserDetail(user)" title="Haz clic para ver detalles">
+          <td>
+            <img [src]="getUserAvatarUrl(user)" 
+                 alt="Avatar" 
+                 class="rounded-circle" 
+                 width="36" 
+                 height="36">
           </td>
           <td><strong>{{ user.username }}</strong></td>
           <td>{{ user.name }} {{ user.surname }}</td>
           <td>{{ user.dni }}</td>
-          <td>{{ user.email }}</td>
           <td>{{ user.phoneNumber || '-' }}</td>
-          <td>{{ user.gender || '-' }}</td>
-          <td>
-           <span *ngFor="let role of user.roles; let last = last" class="badge bg-secondary me-1">
-             <i class="fa-solid fa-shield-halved me-1">&nbsp;&nbsp;</i>
-             {{ role.name }}{{ !last ? ', ' : '' }}
-           </span>
-          </td>
-          <td>
-            <span class="badge" [ngClass]="user.enabled ? 'bg-success' : 'bg-danger'">
-              <i class="fa-solid" [ngClass]="user.enabled ? 'fa-circle-check' : 'fa-circle-xmark'">&nbsp;&nbsp;</i>
-              {{ user.enabled ? 'Activo' : 'Inactivo' }}
-            </span>
-          </td>
-          <td class="text-center">
-            <button 
-              class="btn btn-warning btn-sm me-1" 
-              [routerLink]="canModify ? ['/dashboard/usuarios/editar', user.id] : null" 
-              [disabled]="!canModify"
-              title="Editar usuario">
-              <i class="fa-solid fa-pen-to-square"></i>
-            </button>
-            <button 
-              class="btn btn-danger btn-sm" 
-              (click)="deleteUser(user.id)" 
-              [disabled]="!canModify"
-              title="Eliminar usuario">
-              <i class="fa-solid fa-trash-can"></i>
-            </button>
-          </td>
         </tr>
       </tbody>
     </table>
@@ -89,5 +51,74 @@
   <!-- Mensaje si la lista está vacía -->
   <div *ngIf="!loading && !errorMessage && users.length === 0" class="alert alert-warning">
     <i class="fa-solid fa-circle-info me-2"></i> No se encontraron usuarios con el rol GUEST registrados en el sistema.
+  </div>
+
+  <!-- MODAL FLOTANTE DE DETALLE (Ficha de Usuario) -->
+  <div class="modal-backdrop-custom" *ngIf="selectedUser" (click)="closeUserDetail()">
+    <div class="modal-card-custom" (click)="$event.stopPropagation()">
+      
+      <!-- Botón cerrar -->
+      <button class="btn-close-modal" (click)="closeUserDetail()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <!-- Ficha de Datos -->
+      <div class="text-center mb-4">
+        <img 
+          [src]="getUserAvatarUrl(selectedUser)"
+          alt="Avatar" 
+          class="rounded-circle-avatar mb-3" 
+          width="100" 
+          height="100">
+        <h3 class="user-modal-title">{{ selectedUser.name }} {{ selectedUser.surname }}</h3>
+        <p class="user-modal-subtitle">@{{ selectedUser.username }}</p>
+      </div>
+
+      <div class="user-details-grid">
+        <div class="detail-item">
+          <span class="detail-label"><i class="fa-solid fa-id-card me-1"></i> DNI:</span>
+          <span class="detail-value">{{ selectedUser.dni }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label"><i class="fa-solid fa-envelope me-1"></i> Email:</span>
+          <span class="detail-value">{{ selectedUser.email }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label"><i class="fa-solid fa-phone me-1"></i> Teléfono:</span>
+          <span class="detail-value">{{ selectedUser.phoneNumber || 'No especificado' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label"><i class="fa-solid fa-venus-mars me-1"></i> Género:</span>
+          <span class="detail-value">{{ selectedUser.gender || 'No especificado' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label"><i class="fa-solid fa-shield-halved me-1"></i> Roles:</span>
+          <span class="detail-value">
+            <span *ngFor="let role of selectedUser.roles; let last = last" class="badge bg-secondary me-1">
+              {{ role.name }}{{ !last ? ', ' : '' }}
+            </span>
+          </span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label"><i class="fa-solid fa-toggle-on me-1"></i> Estado:</span>
+          <span class="detail-value">
+            <span class="badge" [ngClass]="selectedUser.enabled ? 'bg-success' : 'bg-danger'">
+              {{ selectedUser.enabled ? 'Activo' : 'Inactivo' }}
+            </span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Acciones dentro del modal -->
+      <div class="mt-4 pt-3 border-top border-secondary d-flex justify-content-end gap-2" *ngIf="canModify">
+        <button class="btn btn-warning btn-sm" [routerLink]="['/dashboard/usuarios/editar', selectedUser.id]" (click)="closeUserDetail()">
+          <i class="fa-solid fa-pen-to-square me-1"></i> Editar
+        </button>
+        <button class="btn btn-danger btn-sm" (click)="deleteUserModal(selectedUser.id)">
+          <i class="fa-solid fa-trash-can me-1"></i> Eliminar
+        </button>
+      </div>
+
+    </div>
   </div>
 </div>

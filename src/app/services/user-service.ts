@@ -82,9 +82,9 @@ private getHeaders(): HttpHeaders {
 
 // GET /private/user/{id}/profile-picture
   getProfilePicture(id: number): Observable<Blob> {
-    return this.http.get<Blob>(`${this.apiUrl}/${id}/profile-picture`, {
-      withCredentials: true,
-      responseType: 'blob' as 'json'
-    });
-  }
+  return this.http.get(`${this.apiUrl}/${id}/profile-picture`, {
+    headers: this.getHeaders(), // Asegura que use las cabeceras con el Token
+    responseType: 'blob'
+  });
+}
 }

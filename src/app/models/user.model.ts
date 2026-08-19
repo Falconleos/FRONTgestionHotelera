@@ -18,6 +18,7 @@ export interface UserDtoResponse {
   accountNonLocked?: boolean;
   credentialsNonExpired?: boolean;
   enabled?: boolean;
+  profilePicture?: string;
 }
 
 export interface UserDtoRequest {

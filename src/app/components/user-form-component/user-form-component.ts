@@ -19,12 +19,13 @@ export class UserFormComponent {
     name: '',
     surname: '',
     dni: '',
-    gender: '', // <-- Agregado campo de género
+    gender: '',
     email: '',
     phoneNumber: '',
     birthDay: '',
     role: 'GUEST' as RoleType,
-    profilePictureFile: undefined as File | undefined
+    profilePictureFile: undefined as File | undefined,
+    enabled: true // <-- Añadido para que nazca activo por defecto
   };
 
   loading = false;
@@ -53,12 +54,13 @@ export class UserFormComponent {
       name: this.formData.name,
       surname: this.formData.surname,
       dni: this.formData.dni,
-      gender: this.formData.gender, // <-- Incluido en el payload
+      gender: this.formData.gender,
       email: this.formData.email,
       phoneNumber: this.formData.phoneNumber,
       birthDay: this.formData.birthDay ? this.formData.birthDay : undefined,
       role: this.formData.role,
-      profilePictureFile: this.formData.profilePictureFile
+      profilePictureFile: this.formData.profilePictureFile,
+      enabled: this.formData.enabled // <-- Incluido en el payload que se envía al servicio
     };
 
     this.userService.createUser(payload).subscribe({

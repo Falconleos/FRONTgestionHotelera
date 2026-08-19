@@ -57,10 +57,23 @@
           </button>
         </div>
         <div class="divider"></div>
-        <span class="user-info">
-          Bienvenido, <strong>{{ username }}</strong> 
-          <span class="text-muted" *ngIf="userRoles">({{ userRoles }})</span>
-        </span>
+        
+        <!-- Perfil de usuario en la barra superior -->
+        <div class="user-profile-container">
+          <div class="user-avatar-wrapper">
+            <img *ngIf="avatarUrl; else defaultIcon" [src]="avatarUrl" alt="Avatar" class="top-user-avatar">
+            <ng-template #defaultIcon>
+              <div class="top-user-default-icon">
+                <i class="fa-solid fa-user"></i>
+              </div>
+            </ng-template>
+          </div>
+          <span class="user-info">
+            Bienvenido, <strong>{{ username }}</strong> 
+            <span class="text-muted" *ngIf="userRole">({{ userRole }})</span>
+          </span>
+        </div>
+
       </div>
     </header>
     
