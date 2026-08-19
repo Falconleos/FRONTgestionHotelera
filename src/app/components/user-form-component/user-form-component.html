@@ -74,6 +74,18 @@
         <label for="phoneNumber" class="form-label">Phone Number *</label>
         <input type="text" id="phoneNumber" class="form-control" name="phoneNumber" [(ngModel)]="formData.phoneNumber" required #phone="ngModel" placeholder="+54 9 11...">
       </div>
+
+      <div class="col-md-6">
+        <label for="address" class="form-label">Address</label>
+        <input type="text" id="address" class="form-control" name="address" [(ngModel)]="formData.address" placeholder="Calle Falsa 123">
+      </div>
+
+      <div class="col-md-6 d-flex align-items-end">
+        <div class="form-check form-switch mb-2">
+          <input class="form-check-input" type="checkbox" id="enabled" name="enabled" [(ngModel)]="formData.enabled">
+          <label class="form-check-label" for="enabled">Usuario activo</label>
+        </div>
+      </div>
     </div>
 
     <hr class="section-divider mb-4">

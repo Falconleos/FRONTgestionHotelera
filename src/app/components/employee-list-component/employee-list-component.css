@@ -101,6 +101,10 @@
   background-color: rgba(255, 255, 255, 0.04);
 }
 
+.cursor-pointer tbody tr {
+  cursor: pointer;
+}
+
 /* Columna de Acciones Fija (Sticky) a la derecha para que nunca se pierda */
 .table th:last-child,
 .table td:last-child {
@@ -251,3 +255,69 @@
   color: #fcd34d;
   border-color: rgba(245, 158, 11, 0.3);
 }
+
+.modal-backdrop-custom {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.75);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050;
+  padding: 16px;
+}
+
+.modal-card-custom {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  padding: 30px;
+  color: #f8fafc;
+  background: rgba(15, 23, 42, 0.94);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.btn-close-modal {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.rounded-circle-avatar {
+  object-fit: cover;
+  border: 2px solid rgba(129, 140, 248, 0.4);
+  border-radius: 50%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.user-modal-title { margin: 0; font-size: 20px; font-weight: 600; }
+.user-modal-subtitle { margin: 4px 0 0; color: #818cf8; }
+.detail-section-title { margin: 14px 0 8px; color: #cbd5e1; font-size: 14px; font-weight: 600; }
+
+.user-details-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.detail-item { display: flex; justify-content: space-between; gap: 16px; align-items: center; font-size: 14px; }
+.detail-label { color: #94a3b8; }
+.detail-value { overflow-wrap: anywhere; text-align: right; font-weight: 600; }

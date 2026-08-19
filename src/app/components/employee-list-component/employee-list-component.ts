@@ -5,6 +5,8 @@ import { RouterLink } from '@angular/router';
 import { EmployeeService } from '../../services/employee-service';
 import { EmployeeDtoResponse } from '../../models/employee.model';
 import { AuthService } from '../../services/auth-service';
+import { UserService } from '../../services/user-service';
+import { UserDtoResponse } from '../../models/user.model';
 
 @Component({
   selector: 'app-employee-list',
@@ -18,9 +20,15 @@ export class EmployeeListComponent implements OnInit {
   loading = true;
   errorMessage = '';
   isAdmin = false;
+  selectedEmployee: EmployeeDtoResponse | null = null;
+  selectedUser: UserDtoResponse | null = null;
+  detailLoading = false;
+  detailError = '';
+  userAvatarUrl = 'assets/default-avatar.png';
 
   constructor(
     private employeeService: EmployeeService,
+    private userService: UserService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {}
@@ -89,5 +97,62 @@ export class EmployeeListComponent implements OnInit {
         }
       });
     }
+  }
+
+  openEmployeeDetail(employee: EmployeeDtoResponse): void {
+    const employeeId = employee.id;
+    this.selectedEmployee = employee;
+    this.selectedUser = null;
+    this.detailError = '';
+    this.detailLoading = true;
+    this.userAvatarUrl = 'assets/default-avatar.png';
+
+    // El perfil de usuario y el perfil de empleado comparten el mismo ID.
+    this.userService.getById(employeeId).subscribe({
+      next: (user) => {
+        if (this.selectedEmployee?.id !== employeeId) return;
+
+        this.selectedUser = user;
+        this.detailLoading = false;
+        this.loadUserAvatar(user.id);
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        if (this.selectedEmployee?.id !== employeeId) return;
+
+        this.detailError = 'No se pudo cargar la información de usuario asociada.';
+        this.detailLoading = false;
+        this.cdr.markForCheck();
+        console.error(err);
+      }
+    });
+  }
+
+  closeEmployeeDetail(): void {
+    this.selectedEmployee = null;
+    this.selectedUser = null;
+    this.detailError = '';
+    this.detailLoading = false;
+  }
+
+  deleteEmployeeModal(id: number): void {
+    this.closeEmployeeDetail();
+    this.deleteEmployee(id);
+  }
+
+  private loadUserAvatar(userId: number): void {
+    this.userService.getProfilePicture(userId).subscribe({
+      next: (blob) => {
+        if (this.selectedUser?.id !== userId) return;
+
+        this.userAvatarUrl = URL.createObjectURL(blob);
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        // Se mantiene el avatar por defecto si el usuario no cargó una foto.
+        console.error('Error al cargar la foto de perfil', err);
+        this.cdr.markForCheck();
+      }
+    });
   }
 }

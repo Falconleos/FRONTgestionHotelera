@@ -21,7 +21,7 @@
 
   <!-- Tabla de datos con estructura Glass y columna fija de acciones -->
   <div class="table-responsive" *ngIf="!loading && !errorMessage && employees.length > 0">
-    <table class="table table-hover align-middle mb-0">
+    <table class="table table-hover align-middle mb-0 cursor-pointer">
       <thead>
         <tr>
           <th>ID</th>
@@ -36,7 +36,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let emp of employees">
+        <tr *ngFor="let emp of employees" (click)="openEmployeeDetail(emp)" title="Haz clic para ver detalles">
           <td>{{ emp.id }}</td>
           <td><strong>{{ emp.username }}</strong></td>
           <td class="text-nowrap">{{ emp.name }} {{ emp.surname }}</td>
@@ -57,12 +57,13 @@
               class="btn btn-warning btn-sm me-1" 
               [routerLink]="isAdmin ? ['/dashboard/employees/editar', emp.id] : null" 
               [disabled]="!isAdmin"
+              (click)="$event.stopPropagation()"
               title="Editar empleado">
               <i class="fa-solid fa-pen-to-square"></i>
             </button>
             <button 
               class="btn btn-danger btn-sm" 
-              (click)="deleteEmployee(emp.id)" 
+              (click)="$event.stopPropagation(); deleteEmployee(emp.id)"
               [disabled]="!isAdmin"
               title="Eliminar empleado">
               <i class="fa-solid fa-trash-can"></i>
@@ -76,5 +77,52 @@
   <!-- Mensaje si la lista está vacía -->
   <div *ngIf="!loading && !errorMessage && employees.length === 0" class="alert alert-warning">
     <i class="fa-solid fa-circle-info me-2"></i> No se encontraron empleados registrados en el sistema.
+  </div>
+
+  <div class="modal-backdrop-custom" *ngIf="selectedEmployee" (click)="closeEmployeeDetail()">
+    <div class="modal-card-custom" (click)="$event.stopPropagation()">
+      <button class="btn-close-modal" (click)="closeEmployeeDetail()" aria-label="Cerrar">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="text-center mb-4">
+        <img [src]="userAvatarUrl" alt="Foto de perfil" class="rounded-circle-avatar mb-3" width="100" height="100">
+        <h3 class="user-modal-title">{{ selectedEmployee.name }} {{ selectedEmployee.surname }}</h3>
+        <p class="user-modal-subtitle">@{{ selectedEmployee.username }}</p>
+      </div>
+
+      <div *ngIf="detailLoading" class="alert alert-info mb-3">
+        <i class="fa-solid fa-spinner fa-spin me-2"></i> Cargando información de usuario...
+      </div>
+      <div *ngIf="detailError" class="alert alert-danger mb-3">
+        <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ detailError }}
+      </div>
+
+      <div class="detail-section-title"><i class="fa-solid fa-id-badge me-1"></i> Datos del empleado</div>
+      <div class="user-details-grid mb-3">
+        <div class="detail-item"><span class="detail-label">Legajo:</span><span class="detail-value">{{ selectedEmployee.employeeNumber || 'No especificado' }}</span></div>
+        <div class="detail-item"><span class="detail-label">Teléfono de emergencia:</span><span class="detail-value">{{ selectedEmployee.emergencyPhoneNumber || 'No especificado' }}</span></div>
+        <div class="detail-item"><span class="detail-label">Fecha de contratación:</span><span class="detail-value">{{ selectedEmployee.hireDate || 'No especificada' }}</span></div>
+        <div class="detail-item"><span class="detail-label">Turno:</span><span class="detail-value">{{ selectedEmployee.shift || 'No especificado' }}</span></div>
+        <div class="detail-item"><span class="detail-label">Salario:</span><span class="detail-value">${{ selectedEmployee.salary | number:'1.2-2' }}</span></div>
+      </div>
+
+      <ng-container *ngIf="selectedUser">
+        <div class="detail-section-title"><i class="fa-solid fa-user me-1"></i> Datos del usuario</div>
+        <div class="user-details-grid">
+          <div class="detail-item"><span class="detail-label">DNI:</span><span class="detail-value">{{ selectedUser.dni }}</span></div>
+          <div class="detail-item"><span class="detail-label">Email:</span><span class="detail-value">{{ selectedUser.email }}</span></div>
+          <div class="detail-item"><span class="detail-label">Teléfono:</span><span class="detail-value">{{ selectedUser.phoneNumber || 'No especificado' }}</span></div>
+          <div class="detail-item"><span class="detail-label">Género:</span><span class="detail-value">{{ selectedUser.gender || 'No especificado' }}</span></div>
+          <div class="detail-item"><span class="detail-label">Dirección:</span><span class="detail-value">{{ selectedUser.address || 'No especificada' }}</span></div>
+          <div class="detail-item"><span class="detail-label">Estado:</span><span class="detail-value"><span class="badge" [ngClass]="selectedUser.enabled ? 'bg-success' : 'bg-danger'">{{ selectedUser.enabled ? 'Activo' : 'Inactivo' }}</span></span></div>
+        </div>
+      </ng-container>
+
+      <div class="mt-4 pt-3 border-top border-secondary d-flex justify-content-end gap-2" *ngIf="isAdmin">
+        <button class="btn btn-warning btn-sm" [routerLink]="['/dashboard/employees/editar', selectedEmployee.id]" (click)="closeEmployeeDetail()"><i class="fa-solid fa-pen-to-square me-1"></i> Editar</button>
+        <button class="btn btn-danger btn-sm" (click)="deleteEmployeeModal(selectedEmployee.id)"><i class="fa-solid fa-trash-can me-1"></i> Eliminar</button>
+      </div>
+    </div>
   </div>
 </div>
