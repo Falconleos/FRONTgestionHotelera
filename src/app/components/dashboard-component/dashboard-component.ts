@@ -29,39 +29,69 @@ export class DashboardComponent implements OnInit {
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
-        this.username = payload.sub || payload.username || 'Usuario';
-        this.userId = payload.id || payload.userId || null;
+        this.username = payload.sub || localStorage.getItem('username') || 'Usuario';
+        
+        // 1. Intentar leer el ID del token
+        this.userId = payload.id || payload.userId || payload.uid || null;
 
-        // Extraer roles y formatear a una sola palabra limpia
-        const roles = payload.roles || payload.authorities || [];
+        // Extraer roles
+        const roles = payload.role || payload.roles || payload.authorities || [];
         let rawRole = '';
         if (Array.isArray(roles) && roles.length > 0) {
           rawRole = typeof roles[0] === 'string' ? roles[0] : (roles[0].authority || roles[0].name || '');
         } else if (typeof roles === 'string') {
           rawRole = roles.split(',')[0].trim();
         }
-
-        // Limpiar prefijo ROLE_ y espacios, quedándose solo con la primera palabra
         this.userRole = rawRole.replace(/^ROLE_/i, '').trim().split(' ')[0];
 
-        // Si tenemos ID, cargamos su foto de perfil
-        if (this.userId) {
-          this.loadProfilePicture(this.userId);
+        // 2. Si no está en el token, buscar en localStorage
+        if (!this.userId) {
+          const storedId = localStorage.getItem('userId');
+          if (storedId) {
+            this.userId = Number(storedId);
+          }
         }
+
+        // 3. Si tenemos ID numérico, cargamos la foto directo
+        if (this.userId) {
+          this.loadProfilePictureById(this.userId);
+        } else if (this.username && this.username !== 'Usuario') {
+          // 4. Si no hay ID, buscamos en la lista general de usuarios por username
+          this.userService.getAll().subscribe({
+            next: (users) => {
+              const currentUser = users.find((u: any) => 
+                u.username === this.username || u.email === this.username
+              );
+
+              // Corregido: Usamos exclusivamente u.id según UserDtoResponse
+              if (currentUser && currentUser.id) {
+                this.userId = currentUser.id;
+                localStorage.setItem('userId', this.userId!.toString());
+                this.loadProfilePictureById(this.userId!);
+              } else {
+                console.warn('No se encontró un usuario coincidente en la lista para:', this.username);
+              }
+            },
+            error: (err) => {
+              console.error('No se pudo obtener la lista de usuarios', err);
+            }
+          });
+        }
+
       } catch (e) {
         console.error('Error al decodificar el token:', e);
       }
     }
   }
 
-  loadProfilePicture(id: number): void {
+  loadProfilePictureById(id: number): void {
     this.userService.getProfilePicture(id).subscribe({
       next: (blob) => {
         this.avatarUrl = URL.createObjectURL(blob);
         this.cdr.markForCheck();
       },
       error: (err) => {
-        console.error('No se pudo cargar la foto de perfil del usuario logueado', err);
+        console.error('No se pudo cargar la foto de perfil', err);
         this.avatarUrl = null;
         this.cdr.markForCheck();
       }
@@ -69,15 +99,7 @@ export class DashboardComponent implements OnInit {
   }
 
   logout(): void {
-    this.authService.logout().subscribe({
-      next: () => {
-        localStorage.removeItem('authToken');
-        this.router.navigate(['/']);
-      },
-      error: () => {
-        localStorage.removeItem('authToken');
-        this.router.navigate(['/']);
-      }
-    });
+    localStorage.clear();
+    this.router.navigate(['/']);
   }
 }

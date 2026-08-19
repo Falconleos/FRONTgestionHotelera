@@ -87,4 +87,9 @@ private getHeaders(): HttpHeaders {
     responseType: 'blob'
   });
 }
+
+  getUserByUsername(username: string): Observable<any> {
+  return this.http.get<any>(`${this.apiUrl}/username/${username}`);
+}
+
 }

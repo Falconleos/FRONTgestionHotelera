@@ -169,3 +169,28 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
   backdrop-filter: blur(10px);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
+
+/* Estilo personalizado para el input de tipo file */
+input[type="file"].form-control {
+  padding: 0.35rem 0.7rem;
+  line-height: 1.5;
+}
+
+input[type="file"].form-control::file-selector-button {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  border-radius: 6px;
+  padding: 0.2rem 0.7rem;
+  margin-right: 1rem;
+  font-weight: 500;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+input[type="file"].form-control::file-selector-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.3);
+}

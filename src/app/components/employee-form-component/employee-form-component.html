@@ -53,17 +53,40 @@
         <input type="text" class="form-control" id="phoneNumber" name="phoneNumber" [(ngModel)]="formData.phoneNumber" required #phone="ngModel" placeholder="+54 9 11...">
       </div>
 
-      <div class="col-md-6">
-        <label for="birthDay" class="form-label">Fecha de Nacimiento</label>
-        <input type="date" class="form-control" id="birthDay" name="birthDay" [(ngModel)]="formData.birthDay">
+      <!-- Select de Género actualizado -->
+      <div class="col-md-4">
+        <label for="gender" class="form-label">Género</label>
+        <select class="form-select" id="gender" name="gender" [(ngModel)]="formData.gender">
+          <option value="" disabled selected>Seleccione género...</option>
+          <option *ngFor="let g of availableGenders" [value]="g">{{ g }}</option>
+        </select>
       </div>
 
-      <div class="col-md-6">
+      <div class="col-md-4">
+        <label for="birthDay" class="form-label">Fecha de Nacimiento *</label>
+        <input type="date" class="form-control" id="birthDay" name="birthDay" [(ngModel)]="formData.birthDay" required>
+      </div>
+
+      <div class="col-md-4">
         <label for="role" class="form-label">Rol del Sistema *</label>
         <select class="form-select" id="role" name="role" [(ngModel)]="formData.role" required>
           <option value="" disabled selected>Seleccione un rol...</option>
           <option *ngFor="let r of availableRoles" [value]="r">{{ r }}</option>
         </select>
+      </div>
+
+      <div class="col-12">
+        <label for="address" class="form-label">Dirección</label>
+        <input type="text" class="form-control" id="address" name="address" [(ngModel)]="formData.address" placeholder="Calle Falsa 123">
+      </div>
+
+      <!-- Input para la foto de perfil con validación de 2MB -->
+      <div class="col-12">
+        <label for="profilePicture" class="form-label">Foto de Perfil (Opcional - Máx. 2 MB)</label>
+        <input type="file" class="form-control" id="profilePicture" (change)="onFileSelected($event)" accept="image/png, image/jpeg, image/jpg">
+        <div *ngIf="fileError" class="text-danger small mt-1">
+          <i class="fa-solid fa-circle-exclamation me-1"></i> {{ fileError }}
+        </div>
       </div>
     </div>
 
@@ -72,7 +95,12 @@
     <!-- Información Laboral -->
     <h4 class="form-section-title">Información Laboral</h4>
     <div class="row g-3 mb-4">
-      <div class="col-md-6">
+      <div class="col-md-4">
+        <label for="employeeNumber" class="form-label">Número de Empleado</label>
+        <input type="text" class="form-control" id="employeeNumber" name="employeeNumber" [(ngModel)]="formData.employeeNumber" placeholder="EMP-001">
+      </div>
+
+      <div class="col-md-4">
         <label for="shift" class="form-label">Turno *</label>
         <select class="form-select" id="shift" name="shift" [(ngModel)]="formData.shift" required>
           <option value="" disabled selected>Seleccione un turno...</option>
@@ -80,23 +108,37 @@
         </select>
       </div>
 
-      <div class="col-md-6">
+      <div class="col-md-4">
         <label for="salary" class="form-label">Salario ($) *</label>
-        <input type="number" step="0.01" class="form-control" id="salary" name="salary" [(ngModel)]="formData.salary" required min="1" #salary="ngModel" placeholder="0.00">
+        <input type="number" step="0.01" class="form-control" id="salary" name="salary" [(ngModel)]="formData.salary" required min="1" placeholder="0.00">
+      </div>
+
+      <div class="col-md-6">
+        <label for="emergencyPhoneNumber" class="form-label">Teléfono de Emergencia</label>
+        <input type="text" class="form-control" id="emergencyPhoneNumber" name="emergencyPhoneNumber" [(ngModel)]="formData.emergencyPhoneNumber" placeholder="+54 9 11...">
+      </div>
+
+      <div class="col-md-6">
+        <label for="hireDate" class="form-label">Fecha de Contratación *</label>
+        <input type="date" class="form-control" id="hireDate" name="hireDate" [(ngModel)]="formData.hireDate" required>
       </div>
     </div>
 
     <hr class="section-divider mb-4">
 
-    <!-- Botones de acción (Alineados a la derecha de forma prolija) -->
+    <!-- Botones de acción -->
     <div class="form-actions-container">
       <button type="button" class="btn btn-secondary" routerLink="/dashboard/employees">
         Cancelar
       </button>
-      <button type="submit" class="btn btn-success" [disabled]="employeeForm.invalid || loading">
+      <button type="submit" class="btn btn-success" [disabled]="employeeForm.invalid || loading || fileError !== ''">
         <i class="fa-solid" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-check'"></i> 
         {{ loading ? 'Guardando...' : 'Crear Empleado' }}
       </button>
+    </div>
+
+    <div *ngIf="fileError" class="text-danger small mt-1">
+      <i class="fa-solid fa-triangle-exclamation me-1"></i> {{ fileError }}
     </div>
 
   </form>

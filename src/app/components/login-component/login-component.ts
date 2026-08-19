@@ -10,7 +10,7 @@ import { RouterLink } from '@angular/router';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule,RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './login-component.html',
   styleUrls: ['./login-component.css']
 })
@@ -37,26 +37,39 @@ export class LoginComponent {
     this.loading = true;
     this.errorMessage = '';
 
-    this.authService.login(this.loginForm.value).pipe(
+    const loginData = this.loginForm.value;
+
+    this.authService.login(loginData).pipe(
       finalize(() => {
         this.loading = false;
         this.cdr.markForCheck();
       })
     ).subscribe({
-      next: (response) => {
+      next: (response: any) => {
+        // Guardar el token principal
         localStorage.setItem('authToken', response.token);
 
-        // Decodificar el JWT para extraer los roles/autoridades
+        // Si la respuesta del backend incluye un ID o userId, lo guardamos
+        if (response.id || response.userId) {
+          localStorage.setItem('userId', response.id || response.userId);
+        }
+
+        // Decodificar el JWT para extraer el username (sub) y los roles
         try {
           const payloadBase64 = response.token.split('.')[1];
           const decodedJson = atob(payloadBase64);
           const decodedToken = JSON.parse(decodedJson);
 
-          // Spring Security suele guardar el rol en "role", "roles", "authorities" o "sub"
+          // Guardar el username desde el payload del token (o usar el del formulario como respaldo)
+          const username = decodedToken.sub || loginData.username;
+          localStorage.setItem('username', username);
+
+          // Spring Security suele guardar el rol en "role", "roles", "authorities"
           const roles = decodedToken.role || decodedToken.roles || decodedToken.authorities || [];
           localStorage.setItem('role', JSON.stringify(roles));
         } catch (e) {
           console.error('Error al decodificar el token:', e);
+          localStorage.setItem('username', loginData.username);
         }
 
         this.router.navigate(['/dashboard']);
