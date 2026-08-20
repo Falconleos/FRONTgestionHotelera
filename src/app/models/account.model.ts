@@ -2,11 +2,12 @@ import { PaymentDTOResponse } from './payment.model';
 
 export interface AccountDTOResponse {
   id: number;
-  checkInId: number;
-  baseAmount: number;         // <-- Añadido aquí
-  totalAmount: number;
+  bookingId: number;
+  baseAmount: number;
+  servicesTotal?: number;          // Añadido para que coincida con el backend
+  totalAmount?: number;            // Calculado o mapeado en la vista/backend
   paidAmount: number;
-  remainingBalance?: number;
+  remainingBalance?: number;       // Calculado o mapeado en la vista/backend
   isPaid: boolean;
   adjustmentPercentage: number;
   payments: PaymentDTOResponse[];

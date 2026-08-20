@@ -52,14 +52,14 @@ export class AccountDetailComponent implements OnInit {
     this.errorMessage = '';
 
     this.accountService.getAccountByCheckInId(this.checkInId).subscribe({
-      next: (accountData) => {
+      next: (accountData: AccountDTOResponse) => {
         this.account = accountData;
         
         // Sincronizamos el porcentaje que viene del backend
         this.adjustmentPercentage = accountData.adjustmentPercentage ?? 0;
         
-        // Inicializamos los totales
-        this.adjustedTotal = accountData.totalAmount;
+        // Inicializamos los totales asegurando un número válido
+        this.adjustedTotal = accountData.totalAmount ?? 0;
         this.paymentAmount = this.calculateRemaining();
 
         // Obtenemos el check-in para conocer su estado actual
@@ -78,7 +78,7 @@ export class AccountDetailComponent implements OnInit {
           }
         });
       },
-      error: (err) => {
+      error: (err: any) => {
         this.errorMessage = 'No se pudo cargar el resumen de la cuenta.';
         this.loading = false;
         this.cdr.markForCheck();
@@ -106,13 +106,13 @@ export class AccountDetailComponent implements OnInit {
     if (!this.account || this.account.isPaid) return;
 
     this.accountService.updateAdjustmentPercentage(this.checkInId, this.adjustmentPercentage).subscribe({
-      next: (updatedAccount) => {
+      next: (updatedAccount: AccountDTOResponse) => {
         this.account = updatedAccount;
-        this.adjustedTotal = updatedAccount.totalAmount;
+        this.adjustedTotal = updatedAccount.totalAmount ?? 0;
         this.paymentAmount = this.calculateRemaining();
         this.cdr.markForCheck();
       },
-      error: (err) => {
+      error: (err: any) => {
         alert('Error al aplicar el porcentaje de ajuste.');
         console.error(err);
       }
@@ -120,7 +120,7 @@ export class AccountDetailComponent implements OnInit {
   }
 
   calculateAdjustedTotal(): number {
-    return this.account ? this.account.totalAmount : this.adjustedTotal;
+    return this.account ? (this.account.totalAmount ?? this.adjustedTotal) : this.adjustedTotal;
   }
 
   calculateRemaining(): number {
@@ -145,7 +145,7 @@ export class AccountDetailComponent implements OnInit {
         this.transactionReference = '';
         this.loadData();
       },
-      error: (err) => {
+      error: (err: any) => {
         alert('Error al registrar el pago.');
         console.error(err);
       }

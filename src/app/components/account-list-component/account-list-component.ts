@@ -29,7 +29,22 @@ export class AccountListComponent implements OnInit {
     this.loading = true;
     this.accountService.getAllAccounts().subscribe({
       next: (data: AccountDTOResponse[]) => {
-        this.accounts = Array.isArray(data) ? [...data] : [];
+        this.accounts = Array.isArray(data) ? data.map(acc => {
+          // Cálculo seguro de totales y saldos si el backend no los trae calculados
+          const base = acc.baseAmount || 0;
+          const services = acc.servicesTotal || 0;
+          const subtotal = base + services;
+          const adjustment = acc.adjustmentPercentage || 0;
+          const total = subtotal + (subtotal * (adjustment / 100));
+          const paid = acc.paidAmount || 0;
+          
+          return {
+            ...acc,
+            totalAmount: total,
+            remainingBalance: Math.max(0, total - paid)
+          };
+        }) : [];
+        
         this.loading = false;
         this.cdr.markForCheck();
       },

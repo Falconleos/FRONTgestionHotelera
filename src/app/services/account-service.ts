@@ -8,7 +8,7 @@ import { PaymentDTORequest, PaymentDTOResponse } from '../models/payment.model';
   providedIn: 'root'
 })
 export class AccountService {
-  private apiUrl = 'http://localhost:8080/api/accounts';
+  private apiUrl = 'http://localhost:8080/private/accounts';
 
   constructor(private http: HttpClient) {}
 
@@ -20,19 +20,28 @@ export class AccountService {
     return this.http.get<AccountDTOResponse>(`${this.apiUrl}/${id}`, { withCredentials: true });
   }
 
+  getAccountByBookingId(bookingId: number): Observable<AccountDTOResponse> {
+    return this.http.get<AccountDTOResponse>(`${this.apiUrl}/booking/${bookingId}`, { withCredentials: true });
+  }
+
+  // Método alias para resolver la llamada desde AccountDetailComponent
+  getAccountByCheckInId(checkInId: number): Observable<AccountDTOResponse> {
+    return this.getAccountByBookingId(checkInId);
+  }
+
+  updateAdjustmentPercentage(bookingId: number, adjustmentPercentage: number): Observable<AccountDTOResponse> {
+    return this.http.put<AccountDTOResponse>(
+      `${this.apiUrl}/booking/${bookingId}/adjustment`, 
+      { adjustmentPercentage }, 
+      { withCredentials: true }
+    );
+  }
+
   addPayment(request: PaymentDTORequest): Observable<PaymentDTOResponse> {
     return this.http.post<PaymentDTOResponse>(`${this.apiUrl}/payments`, request, { withCredentials: true });
   }
 
-  getAccountByCheckInId(checkInId: number): Observable<AccountDTOResponse> {
-    return this.http.get<AccountDTOResponse>(`${this.apiUrl}/check-in/${checkInId}`, { withCredentials: true });
-  }
-
-  updateAdjustmentPercentage(checkInId: number, adjustmentPercentage: number): Observable<AccountDTOResponse> {
-    return this.http.put<AccountDTOResponse>(
-      `${this.apiUrl}/check-in/${checkInId}/adjustment`, 
-      { adjustmentPercentage }, 
-      { withCredentials: true }
-    );
+  getPaymentsByBookingId(bookingId: number): Observable<PaymentDTOResponse[]> {
+    return this.http.get<PaymentDTOResponse[]>(`${this.apiUrl}/bookings/${bookingId}/payments`, { withCredentials: true });
   }
 }
