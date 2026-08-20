@@ -58,8 +58,8 @@
                 <span *ngIf="!item.user && !$any(item.booking)?.user" class="text-subtitle">N/A</span>
               </td>
               <td>
-                <span *ngIf="item.booking && item.booking.room" class="badge badge-outline">#{{ item.booking.room.number }}</span>
-                <span *ngIf="!item.booking?.room" class="text-subtitle">N/A</span>
+                <span *ngIf="item.booking && item.booking.roomNumber" class="badge badge-outline">#{{ item.booking.roomNumber }}</span>
+                <span *ngIf="!item.booking?.roomNumber" class="text-subtitle">N/A</span>
               </td>
               <!-- Fechas extraídas del booking anidado corregidas -->
               <td>

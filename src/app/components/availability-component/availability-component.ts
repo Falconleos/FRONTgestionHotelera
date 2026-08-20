@@ -87,16 +87,22 @@ export class AvailabilityComponent implements OnInit {
     return diffDays > 0 ? diffDays : 1;
   }
 
+  // <--- Obtiene el precio por noche de forma segura según el modelo actual
+  getRoomPrice(room: RoomDtoResponse): number {
+    return room.roomTypeDTOResponse?.pricePerNight ?? room.pricePerNight ?? 0;
+  }
+
   // <--- Calcula el costo total para una habitación específica
-  calculateTotalPrice(pricePerNight: number): number {
-    return pricePerNight * this.calculateDays();
+  calculateTotalPrice(room: RoomDtoResponse): number {
+    return this.getRoomPrice(room) * this.calculateDays();
   }
 
   // <--- Pregunta antes de confirmar o cancelar
   selectRoomAndRedirect(room: RoomDtoResponse): void {
-    const { checkIn, checkOut } = this.availabilityForm.value;
-    const total = this.calculateTotalPrice(room.pricePerNight ?? 0);
+    const { checkIn, checkOut, guestCount } = this.availabilityForm.value;
+    const pricePerNight = this.getRoomPrice(room);
     const days = this.calculateDays();
+    const total = pricePerNight * days;
 
     const confirmationMessage = 
       `¿Desea confirmar la reserva de la Habitación #${room.number}?\n\n` +
@@ -106,11 +112,16 @@ export class AvailabilityComponent implements OnInit {
     const confirmed = window.confirm(confirmationMessage);
 
     if (confirmed) {
-      const { guestCount } = this.availabilityForm.value;
-      this.bookingStateService.setBookingData({ checkIn, checkOut, guestCount, room });
+      this.bookingStateService.setBookingData({
+        checkIn,
+        checkOut,
+        guestCount,
+        room,
+        nights: days,
+        totalPrice: total
+      });
       this.router.navigate(['/dashboard/bookings/nuevo']);
     } else {
-      // Si cancela, se mantiene en la misma pantalla para volver a consultar u operar
       console.log('Selección de habitación cancelada por el usuario.');
     }
   }

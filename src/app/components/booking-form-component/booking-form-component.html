@@ -16,7 +16,7 @@
       </div>
       <div>
         <h5 class="fw-bold text-main mb-0">Habitación {{ bookingData.room.number }}</h5>
-        <span class="text-subtitle">{{ bookingData.room.roomTypeName }}</span>
+        <span class="text-subtitle">{{ bookingData.room.roomTypeName || bookingData.room.roomTypeDTOResponse?.name }}</span>
       </div>
     </div>
     
@@ -39,33 +39,68 @@
   <!-- Formulario Principal -->
   <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()" class="glass-form">
     
-    <h4 class="form-section-title">Información del Titular</h4>
-    <div class="row g-3 mb-4">
-      
-      <div class="col-md-6">
-        <label for="guestFirstName" class="form-label">Nombre *</label>
-        <div class="input-group">
-          <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
-          <input type="text" id="guestFirstName" class="form-control marginExtra" formControlName="guestFirstName" placeholder="Ej: Juan">
+    <!-- Selector de Tipo de Cliente (Usuario Registrado vs Reserva Rápida) -->
+    <div class="mb-4 p-3 rounded-3" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);">
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" role="switch" id="isRegisteredUser" formControlName="isRegisteredUser">
+        <label class="form-check-label fw-semibold text-main ms-2" for="isRegisteredUser">
+          Asociar a un usuario ya registrado en el sistema
+        </label>
+      </div>
+      <small class="text-subtitle d-block mt-1 ms-4">
+        Si se deja desmarcado, se creará una reserva rápida (telefónica) y el pasajero podrá registrarse o vincularse en el momento del Check-In.
+      </small>
+    </div>
+
+    <!-- OPCIÓN A: Selección de Usuario Registrado -->
+    <div *ngIf="isRegisteredUser" class="mb-4">
+      <h4 class="form-section-title">Seleccionar Usuario del Sistema</h4>
+      <div class="row g-3">
+        <div class="col-12">
+          <label for="userId" class="form-label">Usuario Registrado *</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fa-solid fa-user-check"></i></span>
+            <select id="userId" class="form-control marginExtra" formControlName="userId">
+              <option [ngValue]="null">-- Seleccione un usuario --</option>
+              <option *ngFor="let user of usersList" [value]="user.id">
+                {{ user.name }} {{ user.surname }} (Username: {{ user.username }})
+              </option>
+            </select>
+          </div>
         </div>
       </div>
+    </div>
 
-      <div class="col-md-6">
-        <label for="guestLastName" class="form-label">Apellido *</label>
-        <div class="input-group">
-          <span class="input-group-text"><i class="fa-solid fa-id-card"></i></span>
-          <input type="text" id="guestLastName" class="form-control marginExtra" formControlName="guestLastName" placeholder="Ej: Pérez">
+    <!-- OPCIÓN B: Datos Manuales del Titular -->
+    <div *ngIf="!isRegisteredUser">
+      <h4 class="form-section-title">Información del Huésped Titular</h4>
+      <div class="row g-3 mb-4">
+        
+        <div class="col-md-6">
+          <label for="guestFirstName" class="form-label">Nombre *</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+            <input type="text" id="guestFirstName" class="form-control marginExtra" formControlName="guestFirstName" placeholder="Ej: Juan">
+          </div>
         </div>
-      </div>
 
-      <div class="col-md-6">
-        <label for="guestPhone" class="form-label">Teléfono de Contacto *</label>
-        <div class="input-group">
-          <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
-          <input type="text" id="guestPhone" class="form-control marginExtra" formControlName="guestPhone" placeholder="Ej: +54 9 223 1234567">
+        <div class="col-md-6">
+          <label for="guestLastName" class="form-label">Apellido *</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fa-solid fa-id-card"></i></span>
+            <input type="text" id="guestLastName" class="form-control marginExtra" formControlName="guestLastName" placeholder="Ej: Pérez">
+          </div>
         </div>
-      </div>
 
+        <div class="col-md-6">
+          <label for="guestPhone" class="form-label">Teléfono de Contacto *</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
+            <input type="text" id="guestPhone" class="form-control marginExtra" formControlName="guestPhone" placeholder="Ej: +54 9 223 1234567">
+          </div>
+        </div>
+
+      </div>
     </div>
 
     <hr class="section-divider mb-4">

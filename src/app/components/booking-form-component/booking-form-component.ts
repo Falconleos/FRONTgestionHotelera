@@ -4,6 +4,15 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { BookingService } from '../../services/booking-service';
 import { BookingStateService } from '../../services/booking-state-service';
+import { HttpClient } from '@angular/common/http';
+
+// Interfaz para listar los usuarios disponibles en el selector
+export interface UserDtoResponse {
+  id: number;
+  name: string;
+  surname: string;
+  username: string;
+}
 
 @Component({
   selector: 'app-booking-form',
@@ -15,6 +24,9 @@ import { BookingStateService } from '../../services/booking-state-service';
 export class BookingFormComponent implements OnInit {
   bookingForm!: FormGroup;
   bookingData: any = null;
+  usersList: UserDtoResponse[] = [];
+  
+  isRegisteredUser: boolean = false;
   loading = false;
   errorMessage = '';
 
@@ -22,6 +34,7 @@ export class BookingFormComponent implements OnInit {
     private fb: FormBuilder,
     private bookingService: BookingService,
     private bookingStateService: BookingStateService,
+    private http: HttpClient,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
@@ -36,14 +49,58 @@ export class BookingFormComponent implements OnInit {
     }
 
     this.initForm();
+    this.loadUsers();
+  }
+
+  // Carga la lista de usuarios para la opción de usuario registrado
+  loadUsers(): void {
+    this.http.get<UserDtoResponse[]>('http://localhost:8080/private/user', { withCredentials: true }).subscribe({
+      next: (users: UserDtoResponse[]) => {
+        this.usersList = Array.isArray(users) ? users : [];
+        this.cdr.markForCheck();
+      },
+      error: (err: any) => {
+        console.error('Error al cargar la lista de usuarios', err);
+      }
+    });
   }
 
   initForm(): void {
     this.bookingForm = this.fb.group({
+      isRegisteredUser: [false],
+      userId: [null],
       guestFirstName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
       guestLastName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
       guestPhone: ['', [Validators.required]],
       observation: ['', [Validators.maxLength(250)]]
+    });
+
+    // Control dinámico de validaciones según si se selecciona usuario registrado o reserva rápida
+    this.bookingForm.get('isRegisteredUser')?.valueChanges.subscribe((isReg: any) => {
+      this.isRegisteredUser = isReg;
+      const firstNameCtrl = this.bookingForm.get('guestFirstName');
+      const lastNameCtrl = this.bookingForm.get('guestLastName');
+      const phoneCtrl = this.bookingForm.get('guestPhone');
+      const userIdCtrl = this.bookingForm.get('userId');
+
+      if (isReg) {
+        firstNameCtrl?.clearValidators();
+        lastNameCtrl?.clearValidators();
+        phoneCtrl?.clearValidators();
+        userIdCtrl?.setValidators([Validators.required]);
+      } else {
+        firstNameCtrl?.setValidators([Validators.required, Validators.minLength(2), Validators.maxLength(100)]);
+        lastNameCtrl?.setValidators([Validators.required, Validators.minLength(2), Validators.maxLength(100)]);
+        phoneCtrl?.setValidators([Validators.required]);
+        userIdCtrl?.clearValidators();
+        userIdCtrl?.setValue(null);
+      }
+
+      firstNameCtrl?.updateValueAndValidity();
+      lastNameCtrl?.updateValueAndValidity();
+      phoneCtrl?.updateValueAndValidity();
+      userIdCtrl?.updateValueAndValidity();
+      this.cdr.markForCheck();
     });
   }
 
@@ -58,15 +115,33 @@ export class BookingFormComponent implements OnInit {
 
     const formValues = this.bookingForm.value;
 
+    let firstName = formValues.guestFirstName;
+    let lastName = formValues.guestLastName;
+    let phone = formValues.guestPhone;
+
+    // Si es un usuario registrado, extraemos sus datos de la lista cumpliendo con las validaciones
+    if (formValues.isRegisteredUser && formValues.userId) {
+      const selectedUser = this.usersList.find(u => u.id === Number(formValues.userId));
+      if (selectedUser) {
+        firstName = selectedUser.name;
+        lastName = selectedUser.surname;
+        // Evitamos usar el username como teléfono; si no existe un teléfono en el objeto, usamos uno por defecto
+        phone = (selectedUser as any).phone || 'Sin teléfono'; 
+      }
+    }
+
+    // Payload adaptado al BookingDTORequest del backend
     const requestPayload = {
       checkIn: this.bookingData.checkIn,
       checkOut: this.bookingData.checkOut,
       guestCount: this.bookingData.guestCount,
-      guestFirstName: formValues.guestFirstName,
-      guestLastName: formValues.guestLastName,
-      guestPhone: formValues.guestPhone,
-      observation: formValues.observation,
-      roomId: this.bookingData.room.id
+      roomId: this.bookingData.room.id,
+      userId: formValues.isRegisteredUser ? Number(formValues.userId) : null,
+      guestFirstName: firstName,
+      guestLastName: lastName,
+      guestPhone: phone || 'Sin teléfono',
+      observation: formValues.observation || undefined,
+      totalPrice: this.bookingData.totalPrice
     };
 
     this.bookingService.createBooking(requestPayload).subscribe({
@@ -76,9 +151,9 @@ export class BookingFormComponent implements OnInit {
         this.bookingStateService.clear();
         this.router.navigate(['/dashboard/bookings']);
       },
-      error: (err) => {
+      error: (err: any) => {
         this.loading = false;
-        this.errorMessage = 'Error al registrar la reserva en el sistema. Verifique los datos.';
+        this.errorMessage = err.error?.message || 'Error al registrar la reserva en el sistema. Verifique los datos.';
         this.cdr.markForCheck();
         console.error(err);
       }

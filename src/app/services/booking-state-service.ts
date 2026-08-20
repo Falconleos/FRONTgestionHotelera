@@ -1,22 +1,26 @@
 import { Injectable } from '@angular/core';
 import { RoomDtoResponse } from '../models/room.model';
 
+export interface BookingSelectionData {
+  checkIn: string;
+  checkOut: string;
+  guestCount: number;
+  room: RoomDtoResponse;
+  nights: number;
+  totalPrice: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class BookingStateService {
-  private selectedRoomData: {
-    checkIn: string;
-    checkOut: string;
-    guestCount: number;
-    room: RoomDtoResponse;
-  } | null = null;
+  private selectedRoomData: BookingSelectionData | null = null;
 
-  setBookingData(data: { checkIn: string; checkOut: string; guestCount: number; room: RoomDtoResponse }) {
+  setBookingData(data: BookingSelectionData) {
     this.selectedRoomData = data;
   }
 
-  getBookingData() {
+  getBookingData(): BookingSelectionData | null {
     return this.selectedRoomData;
   }
 

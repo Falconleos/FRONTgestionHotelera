@@ -46,8 +46,8 @@
             </td>
             <td class="text-secondary">{{ booking.guestPhone || '-' }}</td>
             <td>
-              <span *ngIf="booking.room" class="badge badge-outline px-2 py-1">Hab. #{{ booking.room.number }}</span>
-              <span *ngIf="!booking.room" class="text-secondary small">N/A</span>
+              <span *ngIf="booking.roomNumber" class="badge badge-outline px-2 py-1">Hab. #{{ booking.roomNumber }}</span>
+              <span *ngIf="!booking.roomNumber" class="text-secondary small">N/A</span>
             </td>
             <td class="text-secondary small">{{ booking.checkIn }}</td>
             <td class="text-secondary small">{{ booking.checkOut }}</td>

@@ -31,7 +31,7 @@
           <select class="form-control custom-select inputExtra" [(ngModel)]="selectedCheckInId">
             <option [ngValue]="null" disabled>-- Seleccione una estadía --</option>
             <option *ngFor="let c of availableCheckIns" [ngValue]="c.id">
-              Habitación {{ c.booking?.room?.number }} ({{ c.booking?.room?.roomTypeName }}) - Huésped: {{ c.booking?.guestFirstName }} {{ c.booking?.guestLastName }}
+              Habitación {{ c.booking?.roomNumber }} - Huésped: {{ c.booking?.guestFirstName }} {{ c.booking?.guestLastName }}
             </option>
           </select>
         </div>

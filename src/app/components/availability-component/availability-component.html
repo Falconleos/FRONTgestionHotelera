@@ -82,10 +82,10 @@
             <tr *ngFor="let room of availableRooms" (click)="selectRoomAndRedirect(room)" style="cursor: pointer;" title="Haz clic para seleccionar esta habitación">
               <td class="ps-4 text-secondary">#{{ room.id }}</td>
               <td><strong class="text-main">#{{ room.number }}</strong></td>
-              <td class="text-subtitle">{{ room.roomTypeName }}</td>
-              <td><span class="badge badge-outline">{{ room.capacity }} pers.</span></td>
-              <td class="text-secondary">${{ room.pricePerNight | number:'1.2-2' }}</td>
-              <td class="text-end pe-4 fw-bold text-main">${{ calculateTotalPrice(room.pricePerNight ?? 0) | number:'1.2-2' }}</td>
+              <td class="text-subtitle">{{ room.roomTypeDTOResponse?.name || room.roomTypeName || 'N/D' }}</td>
+              <td><span class="badge badge-outline">{{ room.roomTypeDTOResponse?.capacity || room.capacity || 0 }} pers.</span></td>
+              <td class="text-secondary">${{ getRoomPrice(room) | number:'1.2-2' }}</td>
+              <td class="text-end pe-4 fw-bold text-main">${{ calculateTotalPrice(room) | number:'1.2-2' }}</td>
             </tr>
           </tbody>
         </table>
