@@ -26,6 +26,10 @@ export class EmployeeListComponent implements OnInit {
   detailError = '';
   userAvatarUrl = 'assets/default-avatar.png';
 
+  // Almacena las URLs de blobs en caché para los avatares y roles de la tabla
+  employeeAvatars: { [key: number]: string } = {};
+  employeeRoles: { [key: number]: string } = {};
+
   constructor(
     private employeeService: EmployeeService,
     private userService: UserService,
@@ -45,7 +49,7 @@ export class EmployeeListComponent implements OnInit {
         const roles = JSON.parse(storedRoles);
         if (Array.isArray(roles)) {
           this.isAdmin = roles.some((r: any) => {
-            const val = typeof r === 'string' ? r : (r.authority || '');
+            const val = typeof r === 'string' ? r : (r.authority || r.name || '');
             return val === 'ADMIN' || val === 'ROLE_ADMIN';
           });
         } else {
@@ -68,6 +72,13 @@ export class EmployeeListComponent implements OnInit {
       next: (data: EmployeeDtoResponse[]) => {
         this.employees = Array.isArray(data) ? [...data] : [];
         this.loading = false;
+
+        // Precarga las fotos de perfil y roles de cada empleado en la tabla
+        this.employees.forEach(emp => {
+          this.loadEmployeeAvatar(emp.id);
+          this.loadEmployeeRole(emp.id);
+        });
+
         this.cdr.markForCheck();
       },
       error: (err: any) => {
@@ -77,6 +88,39 @@ export class EmployeeListComponent implements OnInit {
         console.error(err);
       }
     });
+  }
+
+  // Método para obtener y cachear el rol del usuario vinculado basándose en RoleEntity
+  private loadEmployeeRole(employeeId: number): void {
+    this.userService.getById(employeeId).subscribe({
+      next: (user: any) => {
+        let roleName = 'N/A';
+        
+        // Comprueba si viene un objeto RoleEntity único o una lista de roles
+        const rawRole = user.role || (user.roles && user.roles[0]);
+
+        if (rawRole) {
+          if (typeof rawRole === 'string') {
+            roleName = rawRole;
+          } else {
+            // Maneja RoleEntity (.name o .authority)
+            roleName = rawRole.name || rawRole.authority || 'N/A';
+          }
+        }
+
+        this.employeeRoles[employeeId] = roleName;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.employeeRoles[employeeId] = 'N/A';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  getEmployeeRole(emp: EmployeeDtoResponse | null): string {
+    if (!emp || !emp.id) return 'N/A';
+    return this.employeeRoles[emp.id] || 'Cargando...';
   }
 
   deleteEmployee(id: number): void {
@@ -89,6 +133,8 @@ export class EmployeeListComponent implements OnInit {
       this.employeeService.deleteEmployee(id).subscribe({
         next: () => {
           this.employees = this.employees.filter((emp: EmployeeDtoResponse) => emp.id !== id);
+          delete this.employeeAvatars[id];
+          delete this.employeeRoles[id];
           this.cdr.markForCheck();
         },
         error: (err: any) => {
@@ -105,16 +151,16 @@ export class EmployeeListComponent implements OnInit {
     this.selectedUser = null;
     this.detailError = '';
     this.detailLoading = true;
-    this.userAvatarUrl = 'assets/default-avatar.png';
+    this.userAvatarUrl = this.employeeAvatars[employeeId] || 'assets/default-avatar.png';
 
-    // El perfil de usuario y el perfil de empleado comparten el mismo ID.
+    // El perfil de usuario y el de empleado comparten el mismo ID.
     this.userService.getById(employeeId).subscribe({
       next: (user) => {
         if (this.selectedEmployee?.id !== employeeId) return;
 
         this.selectedUser = user;
         this.detailLoading = false;
-        this.loadUserAvatar(user.id);
+        this.loadUserAvatarModal(user.id);
         this.cdr.markForCheck();
       },
       error: (err) => {
@@ -140,16 +186,37 @@ export class EmployeeListComponent implements OnInit {
     this.deleteEmployee(id);
   }
 
-  private loadUserAvatar(userId: number): void {
+  private loadEmployeeAvatar(employeeId: number): void {
+    if (this.employeeAvatars[employeeId]) return;
+
+    this.userService.getProfilePicture(employeeId).subscribe({
+      next: (blob) => {
+        this.employeeAvatars[employeeId] = URL.createObjectURL(blob);
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.employeeAvatars[employeeId] = 'assets/default-avatar.png';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  getEmployeeAvatarUrl(emp: EmployeeDtoResponse | null): string {
+    if (!emp || !emp.id) return 'assets/default-avatar.png';
+    return this.employeeAvatars[emp.id] || 'assets/default-avatar.png';
+  }
+
+  private loadUserAvatarModal(userId: number): void {
     this.userService.getProfilePicture(userId).subscribe({
       next: (blob) => {
         if (this.selectedUser?.id !== userId) return;
 
-        this.userAvatarUrl = URL.createObjectURL(blob);
+        const objectUrl = URL.createObjectURL(blob);
+        this.userAvatarUrl = objectUrl;
+        this.employeeAvatars[userId] = objectUrl; // Actualiza también la caché de la tabla
         this.cdr.markForCheck();
       },
       error: (err) => {
-        // Se mantiene el avatar por defecto si el usuario no cargó una foto.
         console.error('Error al cargar la foto de perfil', err);
         this.cdr.markForCheck();
       }

@@ -86,6 +86,7 @@
             <th>Tipo</th>
             <th>Capacidad</th>
             <th>Precio por Noche</th>
+            <th>Imágenes</th>
             <th>Estado</th>
             <th class="text-end pe-4">Acciones</th>
           </tr>
@@ -94,9 +95,18 @@
           <tr *ngFor="let room of rooms">
             <td class="ps-4 text-secondary">#{{ room.id }}</td>
             <td><strong class="text-main">#{{ room.number }}</strong></td>
-            <td><span class="text-main fw-medium">{{ room.roomTypeName }}</span></td>
-            <td><span class="text-subtitle">{{ room.capacity }} pers.</span></td>
-            <td class="text-main fw-semibold">${{ room.pricePerNight | number:'1.2-2' }}</td>
+            <td><span class="text-main fw-medium">{{ room.roomTypeDTOResponse?.name || room.roomTypeName || 'N/A' }}</span></td>
+            <td><span class="text-subtitle">{{ room.roomTypeDTOResponse?.capacity || room.capacity }} pers.</span></td>
+            <td class="text-main fw-semibold">${{ (room.roomTypeDTOResponse?.pricePerNight ?? room.pricePerNight) | number:'1.2-2' }}</td>
+            <td>
+              <span 
+                class="badge bg-secondary bg-opacity-25 text-light border border-secondary border-opacity-25" 
+                style="cursor: pointer;" 
+                (click)="openImagesModal(room)"
+                title="Ver imágenes de la habitación">
+                <i class="fa-solid fa-image me-1"></i> {{ room.imagesCount || 0 }}
+              </span>
+            </td>
             <td>
               <span class="badge" [ngClass]="{
                 'badge-success-glass': room.state === 'AVAILABLE',
@@ -131,5 +141,57 @@
   <!-- Mensaje si la lista está vacía -->
   <div *ngIf="!loading && !errorMessage && rooms.length === 0" class="alert alert-warning text-center py-4">
     <i class="fa-solid fa-circle-exclamation me-2"></i> No se encontraron habitaciones registradas en el sistema.
+  </div>
+</div>
+
+<!-- Modal de Imágenes Simplificado con Visor Central Uniforme y Carrusel -->
+<div *ngIf="showImageModal" class="modal-container-overlay" (click)="closeImagesModal()">
+  <div class="modal-dialog-centered-custom" (click)="$event.stopPropagation()">
+    <div class="glass-form text-light border border-secondary border-opacity-50 shadow-lg" style="background: rgba(15, 23, 42, 0.98); width: 100%; max-width: 800px; border-radius: 16px; overflow: hidden;">
+      
+      <!-- Cabecera del Modal Centrada -->
+<div class="modal-header border-bottom border-secondary border-opacity-25 px-4 py-3 d-flex justify-content-center align-items-center">
+  <h5 class="modal-title text-main m-0 d-flex align-items-center gap-2 text-center">
+    <i class="fa-solid fa-images" style="color: #818cf8;"></i>
+    <span>Habitación <strong class="text-info">#{{ selectedRoomNumber }}</strong></span>
+  </h5>
+</div>
+      
+      <!-- Cuerpo del Modal -->
+      <div class="modal-body p-4 text-center">
+        <div *ngIf="roomImages && roomImages.length > 0; else noImages">
+          
+          <!-- Contenedor Central Ampliado y Uniforme -->
+          <div class="main-viewer-container position-relative rounded-4 overflow-hidden border border-secondary border-opacity-25 bg-black mx-auto d-flex align-items-center justify-content-center" style="width: 100%; height: 460px;">
+            <img [src]="roomImages[activeImageIndex]" alt="Imagen de la habitación" class="w-100 h-100 object-fit-cover">
+            
+            <!-- Botón Anterior -->
+            <button *ngIf="roomImages.length > 1" class="carousel-control-btn prev" (click)="prevImage()">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            
+            <!-- Botón Siguiente -->
+            <button *ngIf="roomImages.length > 1" class="carousel-control-btn next" (click)="nextImage()">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          
+          </div>
+
+        </div>
+
+        <ng-template #noImages>
+          <div class="text-center py-5 text-subtitle">
+            <i class="fa-solid fa-circle-exclamation fa-3x mb-3 text-warning"></i>
+            <p class="mb-0 fs-6">Esta habitación no tiene imágenes cargadas.</p>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Pie del Modal -->
+      <div class="modal-footer border-top border-secondary border-opacity-25 px-4 py-3 d-flex justify-content-end">
+        <button type="button" class="btn btn-primary btn-sm w-100 mb-2" (click)="closeImagesModal()">Cerrar</button>
+      </div>
+      
+    </div>
   </div>
 </div>

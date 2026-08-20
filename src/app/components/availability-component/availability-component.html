@@ -85,7 +85,7 @@
               <td class="text-subtitle">{{ room.roomTypeName }}</td>
               <td><span class="badge badge-outline">{{ room.capacity }} pers.</span></td>
               <td class="text-secondary">${{ room.pricePerNight | number:'1.2-2' }}</td>
-              <td class="text-end pe-4 fw-bold text-main">${{ calculateTotalPrice(room.pricePerNight) | number:'1.2-2' }}</td>
+              <td class="text-end pe-4 fw-bold text-main">${{ calculateTotalPrice(room.pricePerNight ?? 0) | number:'1.2-2' }}</td>
             </tr>
           </tbody>
         </table>

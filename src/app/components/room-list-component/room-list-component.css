@@ -298,3 +298,84 @@
 .marginLeft{
   margin-left: 12px;
 }
+
+/* --- Corrección del Visor Central y Botones del Carrusel --- */
+.modal-header, .modal-footer {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.main-viewer-container {
+  position: relative;
+  width: 100% !important;
+  height: 460px !important;
+  background-color: #000;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Forzar que la imagen cubra todo el contenedor de forma uniforme */
+.main-viewer-container img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block;
+}
+
+.carousel-control-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 20;
+}
+
+.carousel-control-btn:hover {
+  background: rgba(129, 140, 248, 0.8);
+  border-color: rgba(129, 140, 248, 0.5);
+  transform: translateY(-50%) scale(1.05);
+}
+
+.carousel-control-btn.prev {
+  left: 20px;
+}
+
+.carousel-control-btn.next {
+  right: 20px;
+}
+
+/* --- Estilos Definitivos para el Modal Flotante --- */
+.modal-container-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.75);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  text-align: center;
+}
+
+.modal-dialog-centered-custom {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  justify-content: start;
+}

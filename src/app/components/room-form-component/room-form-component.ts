@@ -17,6 +17,7 @@ import { RoomDTORequest } from '../../models/room-request.model';
 export class RoomFormComponent implements OnInit {
   roomForm!: FormGroup;
   roomTypes: RoomTypeDTOResponse[] = [];
+  selectedFiles: File[] = []; // Para almacenar las imágenes seleccionadas
   loading = false;
   loadingTypes = true;
   errorMessage = '';
@@ -44,7 +45,8 @@ export class RoomFormComponent implements OnInit {
   initForm(): void {
     this.roomForm = this.fb.group({
       number: ['', [Validators.required, Validators.min(1)]],
-      roomTypeId: ['', [Validators.required]]
+      roomTypeId: ['', [Validators.required]],
+      state: ['AVAILABLE'] // Valor por defecto opcional
     });
   }
 
@@ -65,6 +67,14 @@ export class RoomFormComponent implements OnInit {
     });
   }
 
+  // Método para capturar los archivos seleccionados en el input file
+  onFileSelected(event: any): void {
+    const files: FileList = event.target.files;
+    if (files && files.length > 0) {
+      this.selectedFiles = Array.from(files);
+    }
+  }
+
   onSubmit(): void {
     if (this.roomForm.invalid) {
       this.roomForm.markAllAsTouched();
@@ -75,7 +85,8 @@ export class RoomFormComponent implements OnInit {
     this.errorMessage = '';
     const requestData: RoomDTORequest = this.roomForm.value;
 
-    this.roomService.createRoom(requestData).subscribe({
+    // Enviamos el request junto con la lista de archivos seleccionados
+    this.roomService.createRoom(requestData, this.selectedFiles).subscribe({
       next: () => {
         this.router.navigate(['/dashboard/rooms']);
       },

@@ -19,14 +19,16 @@
     <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ errorMessage }}
   </div>
 
-  <!-- Tabla de datos con estructura Glass y columna fija de acciones -->
-  <div class="table-responsive" *ngIf="!loading && !errorMessage && employees.length > 0">
-    <table class="table table-hover align-middle mb-0 cursor-pointer">
+  <!-- Tabla de datos con scroll horizontal automático si se extiende -->
+  <div class="table-responsive shadow-sm rounded mb-3" style="overflow-x: auto; -webkit-overflow-scrolling: touch;" *ngIf="!loading && !errorMessage && employees.length > 0">
+    <table class="table table-hover align-middle mb-0 cursor-pointer" style="min-width: 1050px;">
       <thead>
         <tr>
+          <th style="width: 60px;">Avatar</th>
           <th>ID</th>
           <th>Username</th>
           <th>Nombre y Apellido</th>
+          <th>Rol</th>
           <th>Legajo / Tel. Emergencia</th>
           <th>Email</th>
           <th>Fecha Contratación</th>
@@ -37,9 +39,33 @@
       </thead>
       <tbody>
         <tr *ngFor="let emp of employees" (click)="openEmployeeDetail(emp)" title="Haz clic para ver detalles">
+          <td>
+            <div class="avatar-table-container">
+              <!-- Miniatura si tiene foto válida -->
+              <img *ngIf="getEmployeeAvatarUrl(emp) !== 'assets/default-avatar.png'"
+                   [src]="getEmployeeAvatarUrl(emp)" 
+                   alt="Avatar" 
+                   class="rounded-circle" 
+                   width="36" 
+                   height="36"
+                   style="object-fit: cover;">
+
+              <!-- Ícono de respaldo si no tiene foto -->
+              <div *ngIf="getEmployeeAvatarUrl(emp) === 'assets/default-avatar.png'" 
+                   class="avatar-table-fallback rounded-circle d-flex justify-content-center align-items-center bg-secondary text-white"
+                   style="width: 36px; height: 36px; font-size: 16px;">
+                <i class="fa-solid fa-user"></i>
+              </div>
+            </div>
+          </td>
           <td>{{ emp.id }}</td>
           <td><strong>{{ emp.username }}</strong></td>
           <td class="text-nowrap">{{ emp.name }} {{ emp.surname }}</td>
+          <td>
+            <span class="badge bg-secondary">
+              <i class="fa-solid fa-shield-halved me-1">&nbsp;</i>{{ getEmployeeRole(emp) }}
+            </span>
+          </td>
           <td>
             <div><small class="text-muted">Legajo:</small> {{ emp.employeeNumber || '-' }}</div>
             <div><small class="text-muted">Emerg.:</small> {{ emp.emergencyPhoneNumber || '-' }}</div>
@@ -86,7 +112,21 @@
       </button>
 
       <div class="text-center mb-4">
-        <img [src]="userAvatarUrl" alt="Foto de perfil" class="rounded-circle-avatar mb-3" width="100" height="100">
+        <div class="avatar-container mb-3 d-flex justify-content-center align-items-center">
+          <!-- Si existe la URL de la imagen, la muestra -->
+          <img *ngIf="userAvatarUrl !== 'assets/default-avatar.png'"
+               [src]="userAvatarUrl" 
+               alt="Foto de perfil" 
+               class="rounded-circle-avatar" 
+               width="100" height="100">
+
+          <!-- Si no existe o falló la carga, muestra el icono perfectamente centrado -->
+          <div *ngIf="userAvatarUrl === 'assets/default-avatar.png'" 
+               class="avatar-fallback">
+            <i class="fa-solid fa-user"></i>
+          </div>
+        </div>
+
         <h3 class="user-modal-title">{{ selectedEmployee.name }} {{ selectedEmployee.surname }}</h3>
         <p class="user-modal-subtitle">@{{ selectedEmployee.username }}</p>
       </div>
@@ -100,6 +140,7 @@
 
       <div class="detail-section-title"><i class="fa-solid fa-id-badge me-1"></i> Datos del empleado</div>
       <div class="user-details-grid mb-3">
+        <div class="detail-item"><span class="detail-label">Rol:</span><span class="detail-value">{{ getEmployeeRole(selectedEmployee) }}</span></div>
         <div class="detail-item"><span class="detail-label">Legajo:</span><span class="detail-value">{{ selectedEmployee.employeeNumber || 'No especificado' }}</span></div>
         <div class="detail-item"><span class="detail-label">Teléfono de emergencia:</span><span class="detail-value">{{ selectedEmployee.emergencyPhoneNumber || 'No especificado' }}</span></div>
         <div class="detail-item"><span class="detail-label">Fecha de contratación:</span><span class="detail-value">{{ selectedEmployee.hireDate || 'No especificada' }}</span></div>

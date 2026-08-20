@@ -48,6 +48,24 @@
       </div>
     </div>
 
+    <!-- Nuevo campo para subir imágenes -->
+    <div class="mb-4">
+      <label for="roomImages" class="form-label">Imágenes de la Habitación (Opcional)</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="fa-solid fa-image"></i></span>
+        <input 
+          type="file" 
+          id="roomImages" 
+          class="form-control marginUpDown" 
+          multiple 
+          accept="image/*"
+          (change)="onFileSelected($event)">
+      </div>
+      <div class="form-text text-muted small mt-1" *ngIf="selectedFiles.length > 0">
+        {{ selectedFiles.length }} archivo(s) seleccionado(s).
+      </div>
+    </div>
+
     <!-- Botones de Acción -->
     <div class="form-actions-container">
       <button type="button" class="btn btn-secondary" routerLink="/dashboard/rooms">

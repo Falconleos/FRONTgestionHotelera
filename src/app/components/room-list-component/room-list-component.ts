@@ -2,9 +2,9 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { RoomService } from '../../services/room-service';
-import { RoomTypeService } from '../../services/room-type-service'; // Asegúrate de tener este servicio creado
+import { RoomTypeService } from '../../services/room-type-service';
 import { RoomDtoResponse } from '../../models/room.model';
-import { RoomTypeDTOResponse } from '../../models/room-type.model'; // Asegúrate de tener este modelo creado
+import { RoomTypeDTOResponse } from '../../models/room-type.model';
 import { AuthService } from '../../services/auth-service';
 
 @Component({
@@ -22,6 +22,12 @@ export class RoomListComponent implements OnInit {
   errorMessage = '';
   errorTypesMessage = '';
   isAdmin = false;
+
+  // Propiedades para el control del modal de imágenes y carrusel
+  selectedRoomNumber: string = '';
+  roomImages: string[] = [];
+  showImageModal: boolean = false;
+  activeImageIndex: number = 0; // Propiedad requerida por la vista
 
   constructor(
     private roomService: RoomService,
@@ -133,6 +139,54 @@ export class RoomListComponent implements OnInit {
           console.error(err);
         }
       });
+    }
+  }
+
+  // Métodos para gestionar el modal de galería de imágenes apuntando al endpoint del backend
+  openImagesModal(room: RoomDtoResponse): void {
+    this.selectedRoomNumber = room.number;
+    const count = room.imagesCount ?? 0;
+    
+    this.roomImages = [];
+    this.activeImageIndex = 0; // Reiniciamos el índice del carrusel
+    this.showImageModal = true;
+
+    if (count > 0) {
+      // Iteramos sobre el índice y descargamos cada imagen usando el servicio con autenticación
+      for (let i = 0; i < count; i++) {
+        this.roomService.getRoomImageBlob(room.id, i).subscribe({
+          next: (blob) => {
+            const unsafeUrl = URL.createObjectURL(blob);
+            this.roomImages.push(unsafeUrl);
+            this.cdr.markForCheck();
+          },
+          error: (err) => {
+            console.error(`Error al cargar la imagen ${i} de la habitación ${room.id}`, err);
+          }
+        });
+      }
+    }
+    this.cdr.markForCheck();
+  }
+
+  closeImagesModal(): void {
+    this.showImageModal = false;
+    this.roomImages = [];
+    this.selectedRoomNumber = '';
+    this.activeImageIndex = 0;
+    this.cdr.markForCheck();
+  }
+
+  // Métodos de navegación para el carrusel de imágenes
+  nextImage(): void {
+    if (this.roomImages.length > 0) {
+      this.activeImageIndex = (this.activeImageIndex + 1) % this.roomImages.length;
+    }
+  }
+
+  prevImage(): void {
+    if (this.roomImages.length > 0) {
+      this.activeImageIndex = (this.activeImageIndex - 1 + this.roomImages.length) % this.roomImages.length;
     }
   }
 }

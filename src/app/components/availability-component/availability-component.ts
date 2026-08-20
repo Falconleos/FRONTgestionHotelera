@@ -95,7 +95,7 @@ export class AvailabilityComponent implements OnInit {
   // <--- Pregunta antes de confirmar o cancelar
   selectRoomAndRedirect(room: RoomDtoResponse): void {
     const { checkIn, checkOut } = this.availabilityForm.value;
-    const total = this.calculateTotalPrice(room.pricePerNight);
+    const total = this.calculateTotalPrice(room.pricePerNight ?? 0);
     const days = this.calculateDays();
 
     const confirmationMessage = 
