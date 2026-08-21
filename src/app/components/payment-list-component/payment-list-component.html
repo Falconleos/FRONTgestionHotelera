@@ -32,18 +32,21 @@
       <tbody>
         <tr *ngFor="let payment of payments">
           <td><strong>#{{ payment.id }}</strong></td>
-          <td>
-            <span *ngIf="payment.username || payment.userSurname; else noUser">
-              {{ payment.username }} {{ payment.userSurname }}
-            </span>
-            <ng-template #noUser>-</ng-template>
-          </td>
-          <td>
-            <span *ngIf="payment.registeredByName || payment.registeredBySurname; else noRegistrar">
-              {{ payment.registeredByName }} {{ payment.registeredBySurname }}
-            </span>
-            <ng-template #noRegistrar>-</ng-template>
-          </td>
+<!-- Columna Huésped -->
+<td>
+  <span *ngIf="$any(payment).guestName || $any(payment).guestSurname; else noUser">
+    {{ $any(payment).guestName }} {{ $any(payment).guestSurname }}
+  </span>
+  <ng-template #noUser>-</ng-template>
+</td>
+
+<!-- Columna Registrado por -->
+<td>
+  <span *ngIf="payment.username; else noRegistrar">
+    {{ payment.username }}
+  </span>
+  <ng-template #noRegistrar>-</ng-template>
+</td>
           <td>
             <span class="badge bg-secondary">
               <i class="fa-solid fa-wallet me-1"></i> Cuenta #{{ payment.accountId }}
