@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ItemService } from '../../services/item-service';
@@ -12,8 +12,8 @@ import { AuthService } from '../../services/auth-service';
   templateUrl: './item-list-component.html',
   styleUrls: ['./item-list-component.css']
 })
-export class ItemListComponent implements OnInit {
-  items: ItemDtoResponse[] = [];
+export class ItemListComponent implements OnInit, OnDestroy {
+  items: (ItemDtoResponse & { imageUrl?: string })[] = [];
   loading = true;
   errorMessage = '';
   isAdmin = false;
@@ -27,6 +27,15 @@ export class ItemListComponent implements OnInit {
   ngOnInit(): void {
     this.checkUserRole();
     this.loadItems();
+  }
+
+  ngOnDestroy(): void {
+    // Limpiamos las URLs creadas en memoria para evitar fugas de memoria
+    this.items.forEach(item => {
+      if (item.imageUrl) {
+        URL.revokeObjectURL(item.imageUrl);
+      }
+    });
   }
 
   checkUserRole(): void {
@@ -57,9 +66,26 @@ export class ItemListComponent implements OnInit {
     
     this.itemService.getAll().subscribe({
       next: (data) => {
-        this.items = Array.isArray(data) ? [...data] : [];
+        this.items = Array.isArray(data) ? data.map(item => ({ ...item })) : [];
         this.loading = false;
         this.cdr.markForCheck();
+
+        // Cargamos la imagen individual de cada ítem de forma asíncrona
+        this.items.forEach(item => {
+          if (item.id) {
+            this.itemService.getItemImage(item.id).subscribe({
+              next: (blob) => {
+                if (blob && blob.size > 0) {
+                  item.imageUrl = URL.createObjectURL(blob);
+                  this.cdr.markForCheck();
+                }
+              },
+              error: () => {
+                // Si el ítem no tiene imagen, el backend devolverá 404 u otro error que simplemente ignoramos
+              }
+            });
+          }
+        });
       },
       error: (err) => {
         this.errorMessage = 'No se pudieron cargar los ítems o no cuentas con los permisos necesarios.';

@@ -207,3 +207,25 @@
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
+
+/* --- Contenedor de Imagen de la Card --- */
+.item-image-container {
+  width: 100%;
+  height: 160px; /* Altura fija para el recuadro de la imagen */
+  position: relative;
+  overflow: hidden; /* Esto evita que la imagen se salga del recuadro */
+  background: rgba(0, 0, 0, 0.25);
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.item-image-container img {
+  width: 100%;
+  object-fit: contain; /* Esto asegura que la imagen entera encaje dentro del recuadro mostrando sus proporciones originales */
+  display: block;
+}
+
+.glass-card:hover .item-image-container img {
+  transform: scale(1.05); /* Sutil zoom al hacer hover en la tarjeta */
+}

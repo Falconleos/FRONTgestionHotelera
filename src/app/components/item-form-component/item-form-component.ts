@@ -20,6 +20,7 @@ export class ItemFormComponent implements OnInit {
     isService: false
   };
 
+  selectedFile?: File; // Variable para almacenar la imagen de referencia
   isEditMode = false;
   itemId: number | null = null;
   loading = false;
@@ -45,6 +46,14 @@ export class ItemFormComponent implements OnInit {
   onServiceChange(): void {
     if (this.item.isService) {
       this.item.quantity = 1;
+    }
+  }
+
+  // Método para capturar el archivo seleccionado
+  onFileSelected(event: any): void {
+    const files: FileList = event.target.files;
+    if (files && files.length > 0) {
+      this.selectedFile = files[0];
     }
   }
 
@@ -81,8 +90,8 @@ export class ItemFormComponent implements OnInit {
     this.successMessage = '';
 
     const requestObservable = this.isEditMode && this.itemId !== null
-      ? this.itemService.updateItem(this.itemId, this.item)
-      : this.itemService.createItem(this.item);
+      ? this.itemService.updateItem(this.itemId, this.item, this.selectedFile)
+      : this.itemService.createItem(this.item, this.selectedFile);
 
     requestObservable.subscribe({
       next: () => {
