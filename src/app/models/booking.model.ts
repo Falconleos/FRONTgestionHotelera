@@ -41,18 +41,27 @@ export interface BookingDtoResponse {
   qrBooking?: string;
   observation?: string;
 
-  // Auditoría de empleados
-  employeeBookingUsername?: string;
-  employeeCheckInUsername?: string;
+  // CORREGIDO: Debe coincidir con el campo userBookingUsername del DTO de Java
+  userBookingUsername?: string;
+  userCheckInUsername?: string;
 
-  // Habitación: el DTO Java ahora devuelve el número directamente
   roomNumber: number; 
-
   totalPrice: number;
-  createdAt: string;      
+  createdAt: string;       
 }
 
+// --- NUEVOS MODELOS DE CANCELACIÓN ---
+
 export interface BookingCancellationDtoRequest {
+  reason: string;
+  userId: number;
+}
+
+export interface BookingCancellationDtoResponse {
+  id: number;
   bookingId: number;
-  reason?: string;
+  nombreApellido: string;
+  employeeUsername: string;
+  cancellationDate: string;
+  reason: string;
 }

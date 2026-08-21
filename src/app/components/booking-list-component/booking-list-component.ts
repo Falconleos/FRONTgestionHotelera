@@ -1,16 +1,17 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; // <--- IMPORTANTE para [(ngModel)]
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { BookingService } from '../../services/booking-service';
 import { BookingDtoResponse } from '../../models/booking.model';
-import { PaymentDTOResponse } from '../../models/payment.model'; // <--- Import del modelo de pago
+import { PaymentDTOResponse } from '../../models/payment.model'; 
 import { AuthService } from '../../services/auth-service';
+import { AccountService } from '../../services/account-service';
 
 @Component({
   selector: 'app-booking-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink], // <--- Añadido FormsModule aquí
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './booking-list-component.html',
   styleUrls: ['./booking-list-component.css']
 })
@@ -18,9 +19,8 @@ export class BookingListComponent implements OnInit {
   bookings: BookingDtoResponse[] = [];
   loading = true;
   errorMessage = '';
-  canModify = false; // Permite acceso a Admin y Recepcionista
+  canModify = false;
 
-  // --- PROPIEDADES PARA GESTIÓN DE SEÑAS ---
   selectedBookingForPayment: BookingDtoResponse | null = null;
   bookingPayments: PaymentDTOResponse[] = [];
   loadingPayments = false;
@@ -32,7 +32,8 @@ export class BookingListComponent implements OnInit {
   constructor(
     private bookingService: BookingService,
     private authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private accountService: AccountService
   ) {}
 
   ngOnInit(): void {
@@ -69,7 +70,6 @@ export class BookingListComponent implements OnInit {
     this.bookingService.getAll().subscribe({
       next: (data) => {
         const allBookings = Array.isArray(data) ? [...data] : [];
-        // Filtramos solo las que están en PENDING o CONFIRMED
         this.bookings = allBookings.filter(
           (b) => b.state === 'PENDING' || b.state === 'CONFIRMED'
         );
@@ -93,18 +93,22 @@ export class BookingListComponent implements OnInit {
 
     const reason = prompt('Por favor, ingrese el motivo de la cancelación:');
     if (reason === null) {
-      return; // El usuario canceló el prompt
+      return;
     }
+
+    const userIdStr = localStorage.getItem('userId');
+    const userId = userIdStr ? Number(userIdStr) : 1;
 
     const request = {
       bookingId: id,
-      reason: reason.trim()
+      reason: reason.trim(),
+      userId: userId
     };
 
     this.bookingService.cancelBooking(request).subscribe({
       next: () => {
         alert(`Reserva ID ${id} cancelada exitosamente.`);
-        this.loadBookings(); // Recarga la lista para reflejar los cambios
+        this.loadBookings();
       },
       error: (err) => {
         alert('Error al intentar cancelar la reserva.');
@@ -120,7 +124,7 @@ export class BookingListComponent implements OnInit {
     }
 
     this.bookingService.confirmBooking(id).subscribe({
-      next: (updatedBooking) => {
+      next: () => {
         alert(`Reserva ID ${id} confirmada exitosamente.`);
         this.loadBookings();
       },
@@ -130,8 +134,6 @@ export class BookingListComponent implements OnInit {
       }
     });
   }
-
-  // --- MÉTODOS PARA GESTIÓN DE SEÑAS ---
 
   openPaymentModal(booking: BookingDtoResponse): void {
     this.selectedBookingForPayment = booking;
@@ -147,13 +149,16 @@ export class BookingListComponent implements OnInit {
 
   loadBookingPayments(bookingId: number): void {
     this.loadingPayments = true;
-    this.bookingService.getPaymentsByBookingId(bookingId).subscribe({
+    
+    // CORREGIDO: Usamos accountService que es donde vive esta llamada
+    this.accountService.getPaymentsByBookingId(bookingId).subscribe({
       next: (payments) => {
-        this.bookingPayments = payments;
+        this.bookingPayments = Array.isArray(payments) ? payments : [];
         this.loadingPayments = false;
         this.cdr.markForCheck();
       },
-      error: () => {
+      error: (err) => {
+        console.error('Error al cargar el historial de señas:', err);
         this.bookingPayments = [];
         this.loadingPayments = false;
         this.cdr.markForCheck();
@@ -167,22 +172,32 @@ export class BookingListComponent implements OnInit {
       return;
     }
 
-    const request = {
-      bookingId: this.selectedBookingForPayment.id,
-      amount: this.newPaymentAmount,
-      paymentMethod: this.newPaymentMethod,
-      transactionReference: this.newPaymentReference.trim()
-    };
+    const bookingId = this.selectedBookingForPayment.id;
 
-    this.bookingService.addPaymentToBooking(request).subscribe({
-      next: () => {
-        alert('Seña registrada exitosamente.');
-        this.loadBookingPayments(this.selectedBookingForPayment!.id);
-        this.newPaymentAmount = null;
-        this.newPaymentReference = '';
+    this.accountService.getAccountByBookingId(bookingId).subscribe({
+      next: (account: any) => {
+        const request = {
+          accountId: account.id,
+          amount: this.newPaymentAmount!,
+          paymentMethod: this.newPaymentMethod,
+          transactionReference: this.newPaymentReference.trim()
+        };
+
+        this.accountService.addPayment(request).subscribe({
+          next: () => {
+            alert('Seña registrada exitosamente.');
+            this.loadBookingPayments(bookingId);
+            this.newPaymentAmount = null;
+            this.newPaymentReference = '';
+          },
+          error: (err: any) => {
+            alert('Error al registrar la seña.');
+            console.error(err);
+          }
+        });
       },
-      error: (err) => {
-        alert('Error al registrar la seña.');
+      error: (err: any) => {
+        alert('No se pudo encontrar la cuenta asociada a esta reserva.');
         console.error(err);
       }
     });

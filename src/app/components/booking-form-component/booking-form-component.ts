@@ -4,15 +4,9 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { BookingService } from '../../services/booking-service';
 import { BookingStateService } from '../../services/booking-state-service';
+import { UserDtoResponse } from '../../models/user.model';
 import { HttpClient } from '@angular/common/http';
 
-// Interfaz para listar los usuarios disponibles en el selector
-export interface UserDtoResponse {
-  id: number;
-  name: string;
-  surname: string;
-  username: string;
-}
 
 @Component({
   selector: 'app-booking-form',
@@ -126,7 +120,7 @@ export class BookingFormComponent implements OnInit {
         firstName = selectedUser.name;
         lastName = selectedUser.surname;
         // Evitamos usar el username como teléfono; si no existe un teléfono en el objeto, usamos uno por defecto
-        phone = (selectedUser as any).phone || 'Sin teléfono'; 
+        phone = selectedUser.phoneNumber || 'Sin teléfono';
       }
     }
 

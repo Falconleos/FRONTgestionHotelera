@@ -33,8 +33,8 @@
         <tr *ngFor="let payment of payments">
           <td><strong>#{{ payment.id }}</strong></td>
           <td>
-            <span *ngIf="payment.userName || payment.userSurname; else noUser">
-              {{ payment.userName }} {{ payment.userSurname }}
+            <span *ngIf="payment.username || payment.userSurname; else noUser">
+              {{ payment.username }} {{ payment.userSurname }}
             </span>
             <ng-template #noUser>-</ng-template>
           </td>

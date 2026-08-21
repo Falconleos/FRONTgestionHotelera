@@ -17,13 +17,13 @@
   <div *ngIf="loading" class="alert alert-info border-0 shadow-sm py-3 mb-4">Cargando registros...</div>
   <div *ngIf="errorMessage" class="alert alert-danger border-0 shadow-sm py-3 mb-4">{{ errorMessage }}</div>
 
-  <!-- Tabla de datos (Estilo Glassmorphism Oscuro) -->
+  <!-- Tabla de datos con Scroll Horizontal -->
   <div class="card border-0 shadow-sm mb-4 rounded-4 overflow-hidden" *ngIf="!loading && !errorMessage && bookings.length > 0">
     <div class="card-header bg-transparent py-3 px-4 border-0 d-flex justify-content-between align-items-center">
         <h5 class="fw-bold text-main mb-0 title-status-board">Status Board</h5>
     </div>
-    <div class="table-responsive mb-0">
-      <table class="table table-hover align-middle mb-0">
+    <div class="table-responsive mb-0" style="overflow-x: auto;">
+      <table class="table table-hover align-middle mb-0" style="min-width: 1100px;">
         <thead>
           <tr>
             <th class="ps-4">ID</th>
@@ -34,6 +34,7 @@
             <th>Check-Out</th>
             <th class="text-center">Huéspedes</th>
             <th class="text-end">Total</th>
+            <th>Registrada por</th>
             <th class="text-center">Estado</th>
             <th class="text-center pe-4">Acciones</th>
           </tr>
@@ -42,7 +43,7 @@
           <tr *ngFor="let booking of bookings">
             <td class="ps-4 fw-semibold text-secondary">#{{ booking.id }}</td>
             <td>
-              <span class="fw-semibold text-main">{{ booking.guestFirstName }} {{ booking.guestLastName }}</span>
+              <span class="fw-semibold text-main d-block">{{ booking.guestFirstName }} {{ booking.guestLastName }}</span>
             </td>
             <td class="text-secondary">{{ booking.guestPhone || '-' }}</td>
             <td>
@@ -53,6 +54,12 @@
             <td class="text-secondary small">{{ booking.checkOut }}</td>
             <td class="text-center">{{ booking.guestCount }}</td>
             <td class="text-end fw-bold text-main">${{ booking.totalPrice | number:'1.2-2' }}</td>
+            <td>
+              <span class="badge bg-light text-dark border px-2 py-1" *ngIf="booking.userBookingUsername">
+                <i class="bi bi-person-badge me-1"></i>{{ booking.userBookingUsername }}
+              </span>
+              <span class="text-secondary small" *ngIf="!booking.userBookingUsername">-</span>
+            </td>
             <td class="text-center">
               <span class="badge rounded-pill px-3 py-2" [ngClass]="{
                 'bg-warning-soft text-warning': booking.state === 'PENDING',
@@ -102,10 +109,8 @@
   <!-- PANEL DE GESTIÓN DE SEÑAS -->
   <div *ngIf="selectedBookingForPayment" class="card border-0 shadow-lg rounded-4 mt-4 overflow-hidden mb-5">
     
-    <!-- Encabezado del Panel con Icono para Ocultar / Minimizar -->
+    <!-- Encabezado del Panel -->
     <div class="card-header bg-transparent text-white d-flex justify-content-between align-items-center py-3 px-4 border-bottom border-light border-opacity-10">
-      
-      <!-- Controles de cierre / ocultar -->
       <div class="d-flex align-items-center gap-2">
         <button 
           class="btn btn-icon-action shadow-none"   
@@ -116,10 +121,10 @@
       </div>
     </div>
       
-      <div class="d-flex flex-column ">
-        <h5 class="fw-bold text-main mb-1 title-gestion-senas">Gestión de Señas</h5>
-        <span class="text-secondary small paddingExtra">Reserva #{{ selectedBookingForPayment.id }} — Titular: {{ selectedBookingForPayment.guestFirstName }} {{ selectedBookingForPayment.guestLastName }}</span>
-      </div>
+    <div class="d-flex flex-column px-4 pt-3">
+      <h5 class="fw-bold text-main mb-1 title-gestion-senas">Gestión de Señas</h5>
+      <span class="text-secondary small paddingExtra">Reserva #{{ selectedBookingForPayment.id }} — Titular: {{ selectedBookingForPayment.guestFirstName }} {{ selectedBookingForPayment.guestLastName }}</span>
+    </div>
     
     <!-- Cuerpo del Panel -->
     <div class="card-body p-4 p-md-5">
@@ -156,7 +161,7 @@
 
         <!-- Columna Derecha: Listado de Señas -->
         <div class="col-lg-8 d-flex flex-column paddingExtra">
-          <h6 class="fw-bold text-secondary mb-3 ">Señas Registradas</h6>
+          <h6 class="fw-bold text-secondary mb-3">Señas Registradas</h6>
           
           <div *ngIf="loadingPayments" class="alert alert-info py-2 border-0 mb-3">Cargando pagos...</div>
           
@@ -168,6 +173,7 @@
                     <th class="ps-4 py-3">Fecha</th>
                     <th class="py-3">Método</th>
                     <th class="py-3">Ref</th>
+                    <th class="py-3">Registrado por</th>
                     <th class="text-end pe-4 py-3">Monto</th>
                   </tr>
                 </thead>
@@ -176,6 +182,12 @@
                     <td class="ps-4 text-secondary small">{{ p.paymentDate | date:'short' }}</td>
                     <td><span class="badge badge-outline">{{ p.paymentMethod }}</span></td>
                     <td class="text-secondary small">{{ p.transactionReference || '-' }}</td>
+                    <td>
+                      <span class="badge bg-light text-dark border px-2 py-1" *ngIf="p.username">
+                          <i class="bi bi-person me-1"></i>{{ p.username }}
+                      </span>
+                      <span class="text-secondary small" *ngIf="!p.username">-</span>
+                    </td>
                     <td class="text-end pe-4 fw-bold text-main">${{ p.amount | number:'1.2-2' }}</td>
                   </tr>
                 </tbody>
