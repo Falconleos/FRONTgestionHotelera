@@ -1,112 +1,126 @@
-<div class="container mt-4">
-  <h2><i class="fa-solid fa-hotel me-2 marginExtra"></i> Gestión de Estadías (Check-In)</h2>
-  <p class="text-subtitle mb-4">Administra los check-ins activos, pendientes para hoy y las acciones rápidas de las estadías.</p>
-  <hr class="mb-4">
-
-  <!-- SECCIÓN: Reservas con check-in para hoy sin check-in creado -->
-  <div *ngIf="pendingBookingsToday.length > 0" class="mb-5">
-    <h5 class="form-section-title mb-3"><i class="fa-solid fa-clock-rotate-left me-2 text-indigo"></i> Reservas pendientes de Check-In para Hoy</h5>
-    <div class="list-group glass-list-group">
-      <button *ngFor="let booking of pendingBookingsToday" 
-              type="button" 
-              class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-              (click)="goToCreateCheckIn(booking)">
-        <div class="text-main">
-          <strong class="text-indigo">Reserva #{{ booking.id }}</strong> - 
-          Huésped: <span *ngIf="$any(booking).user">{{ $any(booking).user.name }} {{ $any(booking).user.surname }}</span>
-                   <span *ngIf="!$any(booking).user && booking.guestFirstName">{{ booking.guestFirstName }} {{ booking.guestLastName }}</span>
-        </div>
-        <span class="badge badge-warning-glass">Hacer Check-In</span>
-      </button>
-    </div>
+<div class="container-fluid paddingExtra">
+  <div class="header-section">
+    <h2 class="fw-bold text-main mb-1">Gestión de Check-Ins y Estadías</h2>
+    <p class="text-secondary">Administre las reservas del día y controle las estadías activas del hotel.</p>
   </div>
 
-  <!-- Mensajes de carga o error -->
-  <div *ngIf="loading" class="alert alert-info mb-4">
-    <i class="fa-solid fa-spinner fa-spin me-2"></i> Cargando registros...
-  </div>
-  <div *ngIf="errorMessage" class="alert alert-danger mb-4">
-    <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ errorMessage }}
-  </div>
+  <!-- Alertas de Carga / Error -->
+  <div *ngIf="loading" class="alert alert-info">Cargando información...</div>
+  <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
 
-  <!-- Tabla de datos de Check-Ins con Estilo Glass -->
-  <div *ngIf="!loading && !errorMessage && checkIns.length > 0" class="results-section">
-    <h3 class="results-title mb-3">Historial y Estadías Activas</h3>
+  <!-- SECCIÓN SUPERIOR: Cards de reservas pendientes/confirmadas para hoy -->
+  <section class="mb-5">
+    <h3 class="mb-3 text-main">Reservas para Check-in Hoy</h3>
     
-    <div class="glass-table-container">
-      <div class="table-responsive mb-0">
-        <table class="table table-hover align-middle mb-0">
-          <thead>
-            <tr>
-              <th class="ps-4">ID</th>
-              <th>Huésped</th>
-              <th>Habitación</th>
-              <th>Check-In</th>
-              <th>Check-Out</th>
-              <th>Total</th>
-              <th>Pagado</th>
-              <th>Estado Estadía</th>
-              <th class="text-end pe-4">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of checkIns">
-              <td class="ps-4 text-secondary">#{{ item.id }}</td>
-              <td>
-                <span *ngIf="item.user" class="text-main fw-medium">{{ item.user.name }} {{ item.user.surname }}</span>
-                <span *ngIf="!item.user && $any(item.booking)?.user" class="text-main fw-medium">{{ $any(item.booking).user.name }} {{ $any(item.booking).user.surname }}</span>
-                <span *ngIf="!item.user && !$any(item.booking)?.user" class="text-subtitle">N/A</span>
-              </td>
-              <td>
-                <span *ngIf="item.booking && item.booking.roomNumber" class="badge badge-outline">#{{ item.booking.roomNumber }}</span>
-                <span *ngIf="!item.booking?.roomNumber" class="text-subtitle">N/A</span>
-              </td>
-              <!-- Fechas extraídas del booking anidado corregidas -->
-              <td>
-                <span class="text-secondary small" *ngIf="item.booking?.checkIn">{{ item.booking?.checkIn }}</span>
-                <span class="text-subtitle small" *ngIf="!item.booking?.checkIn">N/A</span>
-              </td>
-              <td>
-                <span class="text-secondary small" *ngIf="item.booking?.checkOut">{{ item.booking?.checkOut }}</span>
-                <span class="text-subtitle small" *ngIf="!item.booking?.checkOut">N/A</span>
-              </td>
-              <td class="text-main fw-semibold">${{ item.total | number:'1.2-2' }}</td>
-              <td>
-                <span class="badge" [ngClass]="item.paid ? 'badge-success-glass' : 'badge-warning-glass'">
-                  {{ item.paid ? 'Pago' : 'Pendiente' }}
-                </span>
-              </td>
-              <td>
-                <span class="badge" [ngClass]="{
-                  'badge-primary-glass': item.checkInState === 'CURRENTLY_ACTIVE',
-                  'badge-secondary-glass': item.checkInState === 'COMPLETED',
-                  'badge-danger-glass': item.checkInState === 'INTERRUPTED'
-                }">
-                  {{ item.checkInState }}
-                </span>
-              </td>
-              <td class="text-end pe-4">
-                <div class="btn-group btn-group-sm" role="group">
-                  <button class="btn btn-warning me-1 marginExtra" (click)="interruptStay(item.id)" [disabled]="!canModify || item.checkInState === 'INTERRUPTED' || item.checkInState === 'COMPLETED'" title="Interrumpir estadía">
-                    <i class="fa-solid fa-ban"></i>
-                  </button>
-                  <button class="btn btn-info me-1 text-white marginExtra" (click)="viewAccountPlaceholder(item.id)" title="Ver cuenta">
-                    <i class="fa-solid fa-file-invoice-dollar"></i>
-                  </button>
-                  <button class="btn btn-secondary marginExtra" (click)="servicesPlaceholder(item.id)" [disabled]="item.checkInState === 'INTERRUPTED' || item.checkInState === 'COMPLETED'" title="Servicios">
-                    <i class="fa-solid fa-concierge-bell"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    <div *ngIf="pendingBookingsToday.length === 0 && !loading" class="text-secondary">
+      No hay reservas pendientes o confirmadas para realizar check-in hoy.
+    </div>
+
+    <div class="row g-3">
+      <div class="col-auto" *ngFor="let booking of pendingBookingsToday">
+        <div class="card booking-card shadow-sm d-flex flex-column justify-content-between p-3">
+          <!-- Cabecera de la Card: Huésped y Habitación destacada -->
+          <div>
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="badge bg-secondary-soft text-uppercase fs-7">Reserva #{{ booking.id }}</span>
+              <div class="room-badge">
+                <span class="room-number">Hab. {{ booking.roomNumber }}</span>
+              </div>
+            </div>
+            
+            <h5 class="card-title text-main text-truncate mb-2" title="{{ booking.guestFirstName }} {{ booking.guestLastName }}">
+              {{ booking.guestFirstName }} {{ booking.guestLastName }}
+            </h5>
+
+            <!-- Información clave compacta -->
+            <div class="card-info text-secondary">
+              <p class="mb-1"><strong>Tel:</strong> {{ booking.guestPhone }}</p>
+              <p class="mb-1"><strong>Fechas:</strong> {{ booking.checkIn }} al {{ booking.checkOut }}</p>
+              <p class="mb-1"><strong>Total:</strong> ${{ booking.totalPrice }}</p>
+              <p class="mb-0"><small class="text-muted">Creado por: {{ booking.userBookingUsername || 'Sistema' }}</small></p>
+            </div>
+          </div>
+
+          <!-- Botón de acción al pie de la card -->
+          <div class="mt-2">
+            <button class="btn btn-primary w-100" *ngIf="canModify" (click)="goToCreateCheckIn(booking)">
+              Realizar Check-In
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Mensaje si la lista está vacía -->
-  <div *ngIf="!loading && !errorMessage && checkIns.length === 0" class="alert alert-warning text-center py-4">
-    <i class="fa-solid fa-circle-exclamation me-2"></i> No se encontraron estadías registradas en el sistema.
+  <!-- SECCIÓN INFERIOR: Tabla con las reservas en estado CHECKED_IN -->
+  <section>
+    <h3 class="mb-3 text-main">Estadías Activas (Checked-In)</h3>
+
+    <div *ngIf="checkedInBookings.length === 0 && !loading" class="text-secondary">
+      No hay pasajeros con check-in activo actualmente.
+    </div>
+
+    <div class="table-responsive" *ngIf="checkedInBookings.length > 0">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Huésped</th>
+            <th>Habitación</th>
+            <th>Check-In / Out</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let b of checkedInBookings">
+            <td>{{ b.id }}</td>
+            <td>{{ b.guestFirstName }} {{ b.guestLastName }}</td>
+            <td>{{ b.roomNumber }}</td>
+            <td>{{ b.checkIn }} - {{ b.checkOut }}</td>
+            <td>
+              <button class="btn btn-dark-solid btn-sm me-1" (click)="servicesPlaceholder(b.id)">Servicios</button>
+              <button class="btn btn-dark-solid btn-sm me-1" (click)="viewAccountPlaceholder(b.id)">Cuenta</button>
+              <button class="btn btn-danger btn-sm" *ngIf="canModify" (click)="interruptStay(b.id)">Interrumpir</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- MODAL O PANEL RÁPIDO PARA EL CHECK-IN -->
+  <div class="modal fade show d-block" tabindex="-1" *ngIf="selectedBookingForCheckIn" style="background: rgba(0,0,0,0.6); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content card border">
+        <div class="modal-header border-bottom border-secondary">
+          <h5 class="modal-title text-main">Confirmar Check-In para Reserva #{{ selectedBookingForCheckIn.id }}</h5>
+          <button type="button" class="btn-close btn-close-white" (click)="selectedBookingForCheckIn = null"></button>
+        </div>
+        <div class="modal-body">
+          <div *ngIf="checkInSuccess" class="alert alert-info">{{ checkInSuccess }}</div>
+          <div *ngIf="checkInError" class="alert alert-danger">{{ checkInError }}</div>
+
+          <div class="mb-3" *ngIf="!showNewUserForm">
+            <label class="form-label text-secondary">Ingrese DNI del Huésped:</label>
+            <input type="text" class="form-control form-control-sm" [(ngModel)]="inputDni" placeholder="Número de DNI">
+            <button class="btn btn-primary mt-3 w-100" (click)="submitCheckInWithDni()">Validar y Registrar Check-In</button>
+          </div>
+
+          <!-- Formulario en caliente si el usuario no existe -->
+          <div *ngIf="showNewUserForm" class="border-top border-secondary pt-3 mt-3">
+            <h6 class="text-warning mb-3">Usuario no encontrado. Complete los datos para registrarlo:</h6>
+            <div class="mb-2"><input type="text" class="form-control form-control-sm" [(ngModel)]="newUser.username" placeholder="Username"></div>
+            <div class="mb-2"><input type="email" class="form-control form-control-sm" [(ngModel)]="newUser.email" placeholder="Email"></div>
+            <div class="mb-2"><input type="password" class="form-control form-control-sm" [(ngModel)]="newUser.password" placeholder="Password"></div>
+            <div class="mb-2"><input type="text" class="form-control form-control-sm" [(ngModel)]="newUser.name" placeholder="Nombre"></div>
+            <div class="mb-2"><input type="text" class="form-control form-control-sm" [(ngModel)]="newUser.surname" placeholder="Apellido"></div>
+            <div class="mb-2"><input type="text" class="form-control form-control-sm" [(ngModel)]="newUser.dni" placeholder="DNI"></div>
+            <div class="mb-2"><input type="text" class="form-control form-control-sm" [(ngModel)]="newUser.phoneNumber" placeholder="Teléfono"></div>
+            
+            <button class="btn btn-primary w-100 mt-2" (click)="createNewUserAndProceed()">Crear Usuario y Hacer Check-In</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

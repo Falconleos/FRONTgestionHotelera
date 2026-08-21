@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CheckInService } from '../../services/check-in-service';
 import { CheckInDtoResponse } from '../../models/check-in.model';
@@ -9,16 +10,38 @@ import { AuthService } from '../../services/auth-service';
 @Component({
   selector: 'app-check-in-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './check-in-list-component.html',
   styleUrls: ['./check-in-list-component.css']
 })
 export class CheckInListComponent implements OnInit {
-  checkIns: CheckInDtoResponse[] = [];
+  // Lista superior: Reservas de hoy pendientes o confirmadas
   pendingBookingsToday: BookingDtoResponse[] = [];
+  
+  // Lista inferior: Reservas que ya tienen estado CHECKED_IN
+  checkedInBookings: BookingDtoResponse[] = [];
+
   loading = true;
   errorMessage = '';
   canModify = false;
+
+  // --- PROPIEDADES PARA EL FLUJO DE CHECK-IN Y ASOCIACIÓN DE USUARIOS ---
+  selectedBookingForCheckIn: BookingDtoResponse | null = null;
+  inputDni = '';
+  
+  users: any[] = [];
+  showNewUserForm = false;
+  newUser = {
+    username: '',
+    email: '',
+    password: '',
+    name: '',
+    surname: '',
+    dni: '',
+    phoneNumber: ''
+  };
+  checkInError = '';
+  checkInSuccess = '';
 
   constructor(
     private checkInService: CheckInService,
@@ -30,6 +53,7 @@ export class CheckInListComponent implements OnInit {
   ngOnInit(): void {
     this.checkUserRole();
     this.loadData();
+    this.loadUsers();
   }
 
   checkUserRole(): void {
@@ -58,52 +82,112 @@ export class CheckInListComponent implements OnInit {
     this.loading = true;
     this.errorMessage = '';
 
-    // Cargamos los check-ins históricos de forma independiente
-    this.checkInService.getAll().subscribe({
-      next: (checkInsData) => {
-        this.checkIns = Array.isArray(checkInsData) ? [...checkInsData] : [];
-        this.processPendingBookings();
-      },
-      error: (err) => {
-        console.error('Error cargando check-ins:', err);
-        this.checkIns = [];
-        this.processPendingBookings(); // Intentamos cargar las de hoy aunque el histórico falle
-      }
-    });
-  }
-
-  processPendingBookings(): void {
+    // 1. Cargamos las reservas de hoy (pendientes/confirmadas para hacerles check-in arriba)
     this.checkInService.getTodayCheckIns().subscribe({
       next: (todayBookings) => {
-        const activeBookingIdsWithCheckIn = new Set(
-          this.checkIns.map(c => c.booking?.id).filter(id => id != null)
-        );
-
-        this.pendingBookingsToday = (Array.isArray(todayBookings) ? todayBookings : []).filter(
-          b => !activeBookingIdsWithCheckIn.has(b.id)
-        );
-
-        this.loading = false;
-        this.cdr.markForCheck();
+        this.pendingBookingsToday = Array.isArray(todayBookings) ? todayBookings : [];
+        this.loadCheckedInBookings();
       },
       error: (err) => {
         console.error('Error cargando reservas de hoy:', err);
         this.errorMessage = 'No se pudieron cargar las reservas programadas para hoy.';
+        this.pendingBookingsToday = [];
+        this.loadCheckedInBookings();
+      }
+    });
+  }
+
+  loadCheckedInBookings(): void {
+    // 2. Cargamos las reservas que están en estado CHECKED_IN para la tabla inferior
+    this.checkInService.getBookingsByState('CHECKED_IN').subscribe({
+      next: (bookings) => {
+        this.checkedInBookings = Array.isArray(bookings) ? bookings : [];
+        this.loading = false;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        console.error('Error cargando reservas con check-in activo:', err);
+        this.checkedInBookings = [];
         this.loading = false;
         this.cdr.markForCheck();
       }
     });
   }
 
+  loadUsers(): void {
+    this.checkInService.getAllUsers().subscribe({
+      next: (data) => {
+        this.users = Array.isArray(data) ? data : [];
+        this.cdr.markForCheck();
+      },
+      error: (err) => console.error('Error al cargar la lista de usuarios:', err)
+    });
+  }
 
-  goToCreateCheckIn(booking: any): void {
-    const userId = booking.user?.id || booking.userId || booking.guest?.id;
+  // --- LÓGICA DE CHECK-IN Y ASOCIACIÓN DE USUARIOS ---
 
-    this.router.navigate(['/dashboard/check-ins/nuevo'], { 
-      queryParams: { 
-        bookingId: booking.id, 
-        userId: userId 
-      } 
+  goToCreateCheckIn(booking: BookingDtoResponse): void {
+    if (!this.canModify) {
+      alert('No tienes los permisos necesarios para realizar esta acción.');
+      return;
+    }
+
+    this.selectedBookingForCheckIn = booking;
+    this.inputDni = booking.guestPhone || ''; 
+    this.showNewUserForm = false;
+    this.checkInError = '';
+    this.checkInSuccess = '';
+  }
+
+  submitCheckInWithDni(): void {
+    if (!this.selectedBookingForCheckIn) return;
+
+    this.checkInService.checkInBooking(this.selectedBookingForCheckIn.id, this.inputDni).subscribe({
+      next: () => {
+        this.checkInSuccess = '¡Check-in realizado con éxito!';
+        setTimeout(() => {
+          this.selectedBookingForCheckIn = null;
+          this.loadData();
+        }, 1200);
+      },
+      error: (err) => {
+        console.error('Error en check-in:', err);
+        const msg = err.error?.message || 'Error al procesar el check-in.';
+        this.checkInError = msg;
+        if (msg.includes('No user found') || msg.includes('no user associated')) {
+          this.showNewUserForm = true; 
+        }
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  createNewUserAndProceed(): void {
+    if (!this.selectedBookingForCheckIn) return;
+
+    this.checkInService.createUser(this.newUser).subscribe({
+      next: (createdUser) => {
+        this.checkInSuccess = 'Usuario creado con éxito. Asociando y realizando check-in...';
+        
+        this.checkInService.assignUserToBooking(this.selectedBookingForCheckIn!.id, createdUser.id).subscribe({
+          next: () => {
+            this.checkInService.checkInBooking(this.selectedBookingForCheckIn!.id, createdUser.dni).subscribe({
+              next: () => {
+                this.checkInSuccess = '¡Check-in y asociación completados con éxito!';
+                setTimeout(() => {
+                  this.selectedBookingForCheckIn = null;
+                  this.showNewUserForm = false;
+                  this.loadData();
+                }, 1500);
+              }
+            });
+          }
+        });
+      },
+      error: (err) => {
+        this.checkInError = err.error?.message || 'Error al crear el nuevo usuario.';
+        this.cdr.markForCheck();
+      }
     });
   }
 
@@ -126,7 +210,6 @@ export class CheckInListComponent implements OnInit {
       },
       error: (err) => {
         console.error(err);
-        // Extraemos el mensaje específico que viene del backend (mensaje o message)
         const backendMessage = err.error?.mensaje || err.error?.message;
         alert(backendMessage || 'Error al intentar interrumpir la estadía.');
       }
