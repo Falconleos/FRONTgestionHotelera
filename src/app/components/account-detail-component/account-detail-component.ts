@@ -58,8 +58,8 @@ export class AccountDetailComponent implements OnInit {
         // Sincronizamos el porcentaje que viene del backend
         this.adjustmentPercentage = accountData.adjustmentPercentage ?? 0;
         
-        // Inicializamos los totales asegurando un número válido
-        this.adjustedTotal = accountData.totalAmount ?? 0;
+        // Inicializamos los totales usando la función dinámica de cálculo
+        this.adjustedTotal = this.calculateAdjustedTotal();
         this.paymentAmount = this.calculateRemaining();
 
         // Obtenemos el check-in para conocer su estado actual
@@ -108,7 +108,8 @@ export class AccountDetailComponent implements OnInit {
     this.accountService.updateAdjustmentPercentage(this.checkInId, this.adjustmentPercentage).subscribe({
       next: (updatedAccount: AccountDTOResponse) => {
         this.account = updatedAccount;
-        this.adjustedTotal = updatedAccount.totalAmount ?? 0;
+        this.adjustmentPercentage = updatedAccount.adjustmentPercentage ?? this.adjustmentPercentage;
+        this.adjustedTotal = this.calculateAdjustedTotal();
         this.paymentAmount = this.calculateRemaining();
         this.cdr.markForCheck();
       },
@@ -119,10 +120,15 @@ export class AccountDetailComponent implements OnInit {
     });
   }
 
+  // Calcula el total general ajustado (Estadía base + Room Service + Porcentaje de ajuste)
   calculateAdjustedTotal(): number {
-    return this.account ? (this.account.totalAmount ?? this.adjustedTotal) : this.adjustedTotal;
+    if (!this.account) return 0;
+    const rawTotal = this.calculateRawTotal();
+    const adjustmentFactor = 1 + (this.adjustmentPercentage / 100);
+    return rawTotal * adjustmentFactor;
   }
 
+  // Calcula el restante restando todo el historial de pagos al total general ajustado
   calculateRemaining(): number {
     if (!this.account) return 0;
     const totalPaid = this.account.payments ? this.account.payments.reduce((acc, p) => acc + p.amount, 0) : 0;
