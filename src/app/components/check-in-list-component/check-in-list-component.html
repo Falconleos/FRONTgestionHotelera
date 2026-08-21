@@ -1,5 +1,5 @@
 <div class="container-fluid paddingExtra">
-  <div class="header-section">
+  <div class="header-section mb-4">
     <h2 class="fw-bold text-main mb-1">Gestión de Check-Ins y Estadías</h2>
     <p class="text-secondary">Administre las reservas del día y controle las estadías activas del hotel.</p>
   </div>
@@ -8,7 +8,7 @@
   <div *ngIf="loading" class="alert alert-info">Cargando información...</div>
   <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
 
-  <!-- SECCIÓN SUPERIOR: Cards de reservas pendientes/confirmadas para hoy -->
+  <!-- SECCIÓN SUPERIOR: Cards de reservas pendientes/confirmadas para hoy en filas horizontales -->
   <section class="mb-5">
     <h3 class="mb-3 text-main">Reservas para Check-in Hoy</h3>
     
@@ -16,10 +16,10 @@
       No hay reservas pendientes o confirmadas para realizar check-in hoy.
     </div>
 
+    <!-- Contenedor de grilla para que las cards aparezcan una al lado de la otra -->
     <div class="row g-3">
-      <div class="col-auto" *ngFor="let booking of pendingBookingsToday">
-        <div class="card booking-card shadow-sm d-flex flex-column justify-content-between p-3">
-          <!-- Cabecera de la Card: Huésped y Habitación destacada -->
+      <div class="col-12 col-md-6 col-lg-4 col-xl-3" *ngFor="let booking of pendingBookingsToday">
+        <div class="card booking-card shadow-sm h-100 d-flex flex-column justify-content-between p-3">
           <div>
             <div class="d-flex justify-content-between align-items-start mb-2">
               <span class="badge bg-secondary-soft text-uppercase fs-7">Reserva #{{ booking.id }}</span>
@@ -32,8 +32,7 @@
               {{ booking.guestFirstName }} {{ booking.guestLastName }}
             </h5>
 
-            <!-- Información clave compacta -->
-            <div class="card-info text-secondary">
+            <div class="card-info text-secondary small">
               <p class="mb-1"><strong>Tel:</strong> {{ booking.guestPhone }}</p>
               <p class="mb-1"><strong>Fechas:</strong> {{ booking.checkIn }} al {{ booking.checkOut }}</p>
               <p class="mb-1"><strong>Total:</strong> ${{ booking.totalPrice }}</p>
@@ -41,8 +40,7 @@
             </div>
           </div>
 
-          <!-- Botón de acción al pie de la card -->
-          <div class="mt-2">
+          <div class="mt-3">
             <button class="btn btn-primary w-100" *ngIf="canModify" (click)="goToCreateCheckIn(booking)">
               Realizar Check-In
             </button>
@@ -60,8 +58,8 @@
       No hay pasajeros con check-in activo actualmente.
     </div>
 
-    <div class="table-responsive" *ngIf="checkedInBookings.length > 0">
-      <table class="table align-middle">
+    <div class="table-responsive shadow-sm rounded" *ngIf="checkedInBookings.length > 0">
+      <table class="table align-middle mb-0">
         <thead>
           <tr>
             <th>ID</th>
@@ -88,27 +86,45 @@
     </div>
   </section>
 
-  <!-- MODAL O PANEL RÁPIDO PARA EL CHECK-IN -->
-  <div class="modal fade show d-block" tabindex="-1" *ngIf="selectedBookingForCheckIn" style="background: rgba(0,0,0,0.6); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);">
+  <!-- MODAL / PANEL DE CHECK-IN -->
+  <div class="modal fade show d-block" tabindex="-1" *ngIf="selectedBookingForCheckIn" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content card border">
         <div class="modal-header border-bottom border-secondary">
-          <h5 class="modal-title text-main">Confirmar Check-In para Reserva #{{ selectedBookingForCheckIn.id }}</h5>
+          <h5 class="modal-title text-main">Check-In - Reserva #{{ selectedBookingForCheckIn.id }}</h5>
           <button type="button" class="btn-close btn-close-white" (click)="selectedBookingForCheckIn = null"></button>
         </div>
         <div class="modal-body">
-          <div *ngIf="checkInSuccess" class="alert alert-info">{{ checkInSuccess }}</div>
+          <div *ngIf="checkInSuccess" class="alert alert-success">{{ checkInSuccess }}</div>
           <div *ngIf="checkInError" class="alert alert-danger">{{ checkInError }}</div>
 
-          <div class="mb-3" *ngIf="!showNewUserForm">
-            <label class="form-label text-secondary">Ingrese DNI del Huésped:</label>
-            <input type="text" class="form-control form-control-sm" [(ngModel)]="inputDni" placeholder="Número de DNI">
-            <button class="btn btn-primary mt-3 w-100" (click)="submitCheckInWithDni()">Validar y Registrar Check-In</button>
+          <!-- Selector de usuarios si no tiene uno asignado -->
+          <div *ngIf="showUserSelector && !showNewUserForm && !checkInSuccess" class="mb-3">
+            <h6 class="text-warning mb-3">La reserva no tiene un usuario asociado. Seleccione uno:</h6>
+            
+            <div class="mb-3">
+              <label class="form-label text-secondary">Usuario del Sistema:</label>
+              <select class="form-select form-select-sm" [(ngModel)]="selectedUserId">
+                <option [ngValue]="null" disabled>-- Seleccione un usuario --</option>
+                <option *ngFor="let u of users" [ngValue]="u.id">
+                  {{ u.name }} {{ u.surname }} ({{ u.email }})
+                </option>
+              </select>
+            </div>
+
+            <button class="btn btn-primary w-100 mt-2" [disabled]="!selectedUserId" (click)="assignAndCheckIn()">
+              Asociar y Registrar Check-In
+            </button>
           </div>
 
-          <!-- Formulario en caliente si el usuario no existe -->
+          <!-- Validación por DNI -->
+          <div class="mb-3" *ngIf="!showUserSelector && !showNewUserForm && !checkInSuccess && !checkInError">
+            <p class="text-secondary small">Procesando check-in...</p>
+          </div>
+
+          <!-- Formulario para crear usuario si no existe -->
           <div *ngIf="showNewUserForm" class="border-top border-secondary pt-3 mt-3">
-            <h6 class="text-warning mb-3">Usuario no encontrado. Complete los datos para registrarlo:</h6>
+            <h6 class="text-warning mb-3">Usuario no encontrado. Complete los datos:</h6>
             <div class="mb-2"><input type="text" class="form-control form-control-sm" [(ngModel)]="newUser.username" placeholder="Username"></div>
             <div class="mb-2"><input type="email" class="form-control form-control-sm" [(ngModel)]="newUser.email" placeholder="Email"></div>
             <div class="mb-2"><input type="password" class="form-control form-control-sm" [(ngModel)]="newUser.password" placeholder="Password"></div>
