@@ -23,4 +23,18 @@ export class AuthService {
     return this.http.post<AuthTokenResponse>(`${this.apiUrl}/refresh`, {}, { withCredentials: true });
   }
 
+  /**
+   * Retorna la URL pública de la foto de perfil basada en el ID del usuario
+   */
+  getProfilePictureUrl(userId: number): string {
+    return `${this.apiUrl}/${userId}/profile-picture`;
+  }
+
+  /**
+   * Obtiene el ID numérico del usuario a partir de su username utilizando el endpoint público
+   */
+  getUserIdByUsername(username: string): Observable<number> {
+    return this.http.get<number>(`${this.apiUrl}/by-username/${username}`);
+  }
+
 }

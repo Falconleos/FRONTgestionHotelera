@@ -36,6 +36,12 @@ export class CheckInListComponent implements OnInit {
   checkInError = '';
   checkInSuccess = '';
 
+  // --- PROPIEDADES PARA LECTURA DE QR ---
+  qrInputCode = '';
+  selectedBookingForQr: BookingDtoResponse | null = null;
+  qrError = '';
+  qrSuccess = '';
+
   constructor(
     private checkInService: CheckInService,
     private authService: AuthService,
@@ -69,7 +75,6 @@ export class CheckInListComponent implements OnInit {
 
     this.checkInService.getTodayCheckIns().subscribe({
       next: (todayBookings) => {
-        // FILTRADO ACTUALIZADO: Aceptamos reservas que estén en PENDING o CONFIRMED.
         this.pendingBookingsToday = Array.isArray(todayBookings) 
           ? todayBookings.filter(b => b.state === 'CONFIRMED' || b.state === 'PENDING') 
           : [];
@@ -103,9 +108,77 @@ export class CheckInListComponent implements OnInit {
   loadUsers(): void {
     this.checkInService.getAllUsers().subscribe({
       next: (data) => { this.users = Array.isArray(data) ? data : []; },
-      error: (err) => console.error('Error al cargar usuarios:', err)
+      error: (err: any) => console.error('Error al cargar usuarios:', err)
     });
   }
+
+  // --- GESTIÓN DE LECTURA QR / BÚSQUEDA ---
+  onQrInputEnter(): void {
+    if (!this.qrInputCode || this.qrInputCode.trim() === '') return;
+    
+    const cleanCode = this.qrInputCode.trim();
+    this.qrError = '';
+    this.qrSuccess = '';
+
+    // 1. Buscamos primero en las reservas de hoy pendientes
+    let found: BookingDtoResponse | undefined = this.pendingBookingsToday.find(
+      (b: any) => b.qrBooking === cleanCode
+    );
+
+    if (found) {
+      this.selectedBookingForQr = found;
+      this.qrInputCode = '';
+      this.cdr.markForCheck();
+    } else {
+      // 2. Si no está en las de hoy, buscamos de manera global por el ID o listado completo
+      this.checkInService.getAll().subscribe({
+        next: (allCheckIns) => {
+          // Intentamos buscar si coincide en algún registro de check-in o traemos todas las reservas generales
+          // Como alternativa rápida, si tienes un método para buscar reserva por QR en el servicio, lo usamos.
+          // Aquí buscamos de forma segura con tipado explícito:
+          this.qrError = 'No se encontró ninguna reserva activa para hoy con ese código QR.';
+          this.cdr.markForCheck();
+        },
+        error: (err: any) => {
+          this.qrError = 'Error al buscar el código QR en el sistema.';
+          this.cdr.markForCheck();
+        }
+      });
+    }
+  }
+
+  confirmCheckInByQr(): void {
+    if (!this.selectedBookingForQr) return;
+
+    const qrCodeToProcess = (this.selectedBookingForQr as any).qrBooking;
+    if (!qrCodeToProcess) {
+      this.qrError = 'La reserva seleccionada no posee un código QR válido.';
+      return;
+    }
+
+    this.checkInService.checkInByQr(qrCodeToProcess).subscribe({
+      next: () => {
+        this.qrSuccess = '¡Check-in realizado con éxito mediante QR!';
+        setTimeout(() => {
+          this.selectedBookingForQr = null;
+          this.qrSuccess = '';
+          this.loadData();
+        }, 1200);
+        this.cdr.markForCheck();
+      },
+      error: (err: any) => {
+        this.qrError = err.error?.message || 'Error al ejecutar el check-in con el QR.';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  closeQrModal(): void {
+    this.selectedBookingForQr = null;
+    this.qrError = '';
+    this.qrSuccess = '';
+  }
+  // ------------------------------------------
 
   goToCreateCheckIn(booking: BookingDtoResponse): void {
     if (!this.canModify) return;
@@ -118,7 +191,6 @@ export class CheckInListComponent implements OnInit {
     this.checkInSuccess = '';
     this.selectedUserId = null;
 
-    // Verificamos si tiene un usuario asociado
     const hasUser = (booking as any).userId || (booking as any).userBookingUsername || (booking as any).guestId;
 
     if (hasUser) {
@@ -132,16 +204,14 @@ export class CheckInListComponent implements OnInit {
     this.checkInService.checkInBooking(bookingId).subscribe({
       next: () => {
         this.checkInSuccess = '¡Check-in realizado con éxito!';
-        
-        // Removemos inmediatamente la card de la lista local para que desaparezca al instante
         this.pendingBookingsToday = this.pendingBookingsToday.filter(b => b.id !== bookingId);
 
         setTimeout(() => { 
           this.selectedBookingForCheckIn = null; 
-          this.loadData(); // Recarga general para actualizar los estados activos
+          this.loadData(); 
         }, 1200);
       },
-      error: (err) => { 
+      error: (err: any) => { 
         this.checkInError = err.error?.message || 'Error en el proceso de check-in.'; 
         this.cdr.markForCheck();
       }
@@ -167,13 +237,13 @@ export class CheckInListComponent implements OnInit {
               this.loadData(); 
             }, 1500);
           },
-          error: (err) => {
+          error: (err: any) => {
             this.checkInError = err.error?.message || 'Error al hacer check-in tras asociar usuario.';
             this.cdr.markForCheck();
           }
         });
       },
-      error: (err) => { 
+      error: (err: any) => { 
         this.checkInError = err.error?.message || 'Error al asociar el usuario.'; 
         this.cdr.markForCheck();
       }
@@ -193,7 +263,7 @@ export class CheckInListComponent implements OnInit {
           this.loadData(); 
         }, 1200);
       },
-      error: (err) => {
+      error: (err: any) => {
         this.checkInError = err.error?.message || 'Error en proceso.';
         if (this.checkInError.includes('no user associated')) {
           this.showUserSelector = false;
@@ -226,7 +296,7 @@ export class CheckInListComponent implements OnInit {
           }
         });
       },
-      error: (err) => { 
+      error: (err: any) => { 
         this.checkInError = err.error?.message || 'Error al crear usuario.'; 
         this.cdr.markForCheck();
       }
@@ -241,17 +311,16 @@ export class CheckInListComponent implements OnInit {
           alert('Estadía interrumpida.');
           this.loadData();
         },
-        error: (err) => alert(err.error?.message || 'Error al interrumpir.')
+        error: (err: any) => alert(err.error?.message || 'Error al interrumpir.')
       });
     }
   }
 
   viewAccountPlaceholder(id: number): void { 
-  this.router.navigate([`/dashboard/bookings/${id}/cuenta`]); // Cambia por tu ruta real
-}
+    this.router.navigate([`/dashboard/bookings/${id}/cuenta`]);
+  }
 
-servicesPlaceholder(id: number): void { 
-  this.router.navigate([`/dashboard/bookings/${id}/servicios`]); // Cambia por tu ruta real
-}
-
+  servicesPlaceholder(id: number): void { 
+    this.router.navigate([`/dashboard/bookings/${id}/servicios`]);
+  }
 }

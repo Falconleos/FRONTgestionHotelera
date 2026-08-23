@@ -2,7 +2,6 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../services/auth-service';
-import { UserService } from '../../services/user-service';
 
 @Component({
   selector: 'app-dashboard',
@@ -20,7 +19,6 @@ export class DashboardComponent implements OnInit {
   constructor(
     private router: Router,
     private authService: AuthService,
-    private userService: UserService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -31,11 +29,8 @@ export class DashboardComponent implements OnInit {
         const payload = JSON.parse(atob(token.split('.')[1]));
         this.username = payload.sub || localStorage.getItem('username') || 'Usuario';
         
-        // 1. Intentar leer el ID del token
-        this.userId = payload.id || payload.userId || payload.uid || null;
-
-        // Extraer roles
-        const roles = payload.role || payload.roles || payload.authorities || [];
+        // Extraer roles del token
+        const roles = payload.role || payload.roles || payload.authorities || payload.roles || [];
         let rawRole = '';
         if (Array.isArray(roles) && roles.length > 0) {
           rawRole = typeof roles[0] === 'string' ? roles[0] : (roles[0].authority || roles[0].name || '');
@@ -44,36 +39,23 @@ export class DashboardComponent implements OnInit {
         }
         this.userRole = rawRole.replace(/^ROLE_/i, '').trim().split(' ')[0];
 
-        // 2. Si no está en el token, buscar en localStorage
-        if (!this.userId) {
-          const storedId = localStorage.getItem('userId');
-          if (storedId) {
-            this.userId = Number(storedId);
-          }
-        }
-
-        // 3. Si tenemos ID numérico, cargamos la foto directo
-        if (this.userId) {
+        // 1. Revisar si ya tenemos el ID en localStorage
+        const storedId = localStorage.getItem('userId');
+        if (storedId) {
+          this.userId = Number(storedId);
           this.loadProfilePictureById(this.userId);
         } else if (this.username && this.username !== 'Usuario') {
-          // 4. Si no hay ID, buscamos en la lista general de usuarios por username
-          this.userService.getAll().subscribe({
-            next: (users) => {
-              const currentUser = users.find((u: any) => 
-                u.username === this.username || u.email === this.username
-              );
-
-              // Corregido: Usamos exclusivamente u.id según UserDtoResponse
-              if (currentUser && currentUser.id) {
-                this.userId = currentUser.id;
-                localStorage.setItem('userId', this.userId!.toString());
-                this.loadProfilePictureById(this.userId!);
-              } else {
-                console.warn('No se encontró un usuario coincidente en la lista para:', this.username);
+          // 2. Si no está en localStorage, lo consultamos con el nuevo endpoint público por username
+          this.authService.getUserIdByUsername(this.username).subscribe({
+            next: (id) => {
+              if (id) {
+                this.userId = id;
+                localStorage.setItem('userId', id.toString());
+                this.loadProfilePictureById(id);
               }
             },
             error: (err) => {
-              console.error('No se pudo obtener la lista de usuarios', err);
+              console.warn('No se pudo obtener el ID del usuario por username:', err);
             }
           });
         }
@@ -85,17 +67,8 @@ export class DashboardComponent implements OnInit {
   }
 
   loadProfilePictureById(id: number): void {
-    this.userService.getProfilePicture(id).subscribe({
-      next: (blob) => {
-        this.avatarUrl = URL.createObjectURL(blob);
-        this.cdr.markForCheck();
-      },
-      error: (err) => {
-        console.error('No se pudo cargar la foto de perfil', err);
-        this.avatarUrl = null;
-        this.cdr.markForCheck();
-      }
-    });
+    this.avatarUrl = `http://localhost:8080/public/auth/${id}/profile-picture`;
+    this.cdr.markForCheck();
   }
 
   logout(): void {

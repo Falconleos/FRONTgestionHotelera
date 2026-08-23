@@ -27,7 +27,6 @@
             <th>Usuario</th>
             <th>Comentario</th>
             <th>Valoración</th>
-            <th>ID Estadía</th>
             <th>Fecha</th>
             <th *ngIf="isAdminOrRecepcionist" class="text-end">Acciones</th>
           </tr>
@@ -36,11 +35,8 @@
           <tr *ngFor="let comment of comments">
             <td><strong class="text-subtitle">#{{ comment.id }}</strong></td>
             <td>
-              <div *ngIf="comment.user">
-                <div class="text-main fw-medium">{{ comment.user.name }} {{ comment.user.surname }}</div>
-                <small class="text-subtitle">{{ comment.user.email }}</small>
-              </div>
-              <span *ngIf="!comment.user" class="text-subtitle">Desconocido</span>
+              <div class="text-main fw-medium">{{ comment.name }} {{ comment.surname }}</div>
+              <small class="text-subtitle">&#64;{{ comment.username }}</small>
             </td>
             <td>
               <span class="comment-text" [title]="comment.content">{{ comment.content }}</span>
@@ -49,9 +45,6 @@
               <span class="badge badge-warning-glass">
                 {{ comment.rating }} <i class="fa-solid fa-star ms-1"></i>
               </span>
-            </td>
-            <td>
-              <span class="badge badge-secondary-glass">Check-in #{{ comment.checkInId }}</span>
             </td>
             <td>
               <span class="text-subtitle small">{{ comment.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>

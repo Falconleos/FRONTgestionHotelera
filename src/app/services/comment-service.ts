@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { CommentDtoResponse } from '../models/comment.model';
+import { CommentDtoResponse, CommentDtoRequest } from '../models/comment.model';
 
 @Injectable({
   providedIn: 'root'
@@ -11,29 +11,28 @@ export class CommentService {
 
   constructor(private http: HttpClient) {}
 
-  // Para Admin y Recepcionista (lista todo)
+  // Lista todos los comentarios (Admin/Recepcionista) o los propios (Guest) según lógica del backend
   getAll(): Observable<CommentDtoResponse[]> {
     return this.http.get<CommentDtoResponse[]>(this.apiUrl, { withCredentials: true });
   }
 
-  // Para el Huésped (lista solo sus comentarios)
+  // Lista explícitamente los comentarios propios del usuario logueado
   getMyComments(): Observable<CommentDtoResponse[]> {
     return this.http.get<CommentDtoResponse[]>(`${this.apiUrl}/my-comments`, { withCredentials: true });
   }
 
-  getByCheckIn(checkInId: number): Observable<CommentDtoResponse[]> {
-    return this.http.get<CommentDtoResponse[]>(`${this.apiUrl}/check-in/${checkInId}`, { withCredentials: true });
-  }
-
-  create(comment: any): Observable<CommentDtoResponse> {
+  // Crear comentario (ya no requiere checkInId, solo content y rating)
+  create(comment: CommentDtoRequest): Observable<CommentDtoResponse> {
     return this.http.post<CommentDtoResponse>(this.apiUrl, comment, { withCredentials: true });
   }
 
-  deleteComment(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`, { withCredentials: true });
+  // Actualizar comentario
+  update(id: number, payload: CommentDtoRequest): Observable<CommentDtoResponse> {
+    return this.http.put<CommentDtoResponse>(`${this.apiUrl}/${id}`, payload, { withCredentials: true });
   }
 
-  update(id: number, payload: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${id}`, payload, { withCredentials: true });
+  // Eliminar comentario
+  deleteComment(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`, { withCredentials: true });
   }
 }

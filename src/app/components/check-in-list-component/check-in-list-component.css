@@ -27,10 +27,35 @@ h2, h3, h5, h6 {
   color: #94a3b8 !important;
 }
 
-/* Estilo específico para las Cards de Check-in (Aprox 300x300) */
+/* --- BARRA MODERNA DE ESCANEO DE QR --- */
+.qr-scanner-card {
+  background: rgba(15, 23, 42, 0.75) !important;
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
+}
+
+.qr-scanner-card .form-control {
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #f8fafc;
+  border-radius: 10px 0 0 10px;
+  padding: 10px 14px;
+}
+
+.qr-scanner-card .form-control:focus {
+  background: rgba(15, 23, 42, 0.95);
+  border-color: rgba(129, 140, 248, 0.5);
+  box-shadow: none;
+  color: #f8fafc;
+}
+
+/* --- ESTILO DE LAS CARDS (Ancho: 300px, Alto: 400px Fijos) --- */
 .booking-card {
-  width: 300px;
-  height: 300px;
+  width: 300px !important;
+  height: 400px !important;
   background: rgba(15, 23, 42, 0.75);
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
@@ -38,7 +63,12 @@ h2, h3, h5, h6 {
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
   color: #f8fafc;
+  padding: 1.25rem !important;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 0 auto; /* Centra la card dentro de su columna de Bootstrap */
 }
 
 /* Número de habitación grande en la parte superior */
@@ -56,11 +86,36 @@ h2, h3, h5, h6 {
   letter-spacing: -0.5px;
 }
 
-.card-info {
-  font-size: 0.85rem;
+.card-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #f8fafc;
 }
 
-/* Contenedor de la tabla con efecto Glass */
+.card-info {
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+/* Contenedor del Código QR dentro de la Card */
+.qr-badge-container {
+  background: rgba(2, 6, 23, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 8px;
+  margin-top: auto;
+}
+
+.qr-code-text {
+  font-size: 0.7rem;
+  color: #38bdf8;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --- Contenedor de la tabla con efecto Glass --- */
 .table-responsive {
   background: rgba(15, 23, 42, 0.65);
   -webkit-backdrop-filter: blur(16px);
@@ -104,7 +159,7 @@ h2, h3, h5, h6 {
   background-color: rgba(255, 255, 255, 0.04);
 }
 
-/* Botón Principal Estilo Neón / Glass */
+/* --- Botón Principal Estilo Neón / Glass --- */
 .btn-primary {
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.4), rgba(79, 70, 229, 0.2));
   -webkit-backdrop-filter: blur(10px);
@@ -114,7 +169,7 @@ h2, h3, h5, h6 {
   font-weight: 600;
   padding: 8px 16px;
   box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);
-  border-radius: 8px;
+  border-radius: 10px;
 }
 
 .btn-primary:hover {

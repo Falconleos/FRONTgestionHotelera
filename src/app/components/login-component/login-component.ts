@@ -49,22 +49,23 @@ export class LoginComponent {
         // Guardar el token principal
         localStorage.setItem('authToken', response.token);
 
-        // Si la respuesta del backend incluye un ID o userId, lo guardamos
-        if (response.id || response.userId) {
-          localStorage.setItem('userId', response.id || response.userId);
-        }
-
-        // Decodificar el JWT para extraer el username (sub) y los roles
+        // Decodificar el JWT para extraer el ID, username y roles
         try {
           const payloadBase64 = response.token.split('.')[1];
           const decodedJson = atob(payloadBase64);
           const decodedToken = JSON.parse(decodedJson);
 
-          // Guardar el username desde el payload del token (o usar el del formulario como respaldo)
+          // 1. Extraer y guardar el ID del usuario desde el token o la respuesta
+          const userId = decodedToken.id || decodedToken.userId || decodedToken.uid || response.id || response.userId;
+          if (userId) {
+            localStorage.setItem('userId', userId.toString());
+          }
+
+          // 2. Guardar el username desde el payload del token (o usar el del formulario como respaldo)
           const username = decodedToken.sub || loginData.username;
           localStorage.setItem('username', username);
 
-          // Spring Security suele guardar el rol en "role", "roles", "authorities"
+          // 3. Spring Security suele guardar el rol en "role", "roles", "authorities"
           const roles = decodedToken.role || decodedToken.roles || decodedToken.authorities || [];
           localStorage.setItem('role', JSON.stringify(roles));
         } catch (e) {

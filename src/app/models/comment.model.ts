@@ -1,10 +1,14 @@
-import { UserDtoResponse } from './user.model';
-
 export interface CommentDtoResponse {
   id: number;
   content: string;
   rating: number;
   createdAt: string;
-  checkInId: number;
-  user: UserDtoResponse;
+  name: string;
+  surname: string;
+  username: string;
+}
+
+export interface CommentDtoRequest {
+  content: string;
+  rating: number;
 }

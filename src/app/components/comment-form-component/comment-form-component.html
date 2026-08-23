@@ -18,32 +18,11 @@
     <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ errorMessage }}
   </div>
 
-  <!-- Selección de Estadía (Estilo Glass) -->
-  <div *ngIf="!isEditMode && !checkInId && !loading" class="glass-card mb-4">
-    <div class="glass-card-header ">
-      <i class="fa-solid fa-bed me-2">&nbsp;&nbsp;</i> Selecciona tu estadía
-    </div>
-    <div class="card-body p-4">
-      <div class="mb-0 contentPaddin">
-        <label class="form-label">Estadía disponible *</label>
-        <div class="input-group">
-          <span class="input-group-text"><i class="fa-solid fa-suitcase"></i></span>
-          <select class="form-control custom-select inputExtra" [(ngModel)]="selectedCheckInId">
-            <option [ngValue]="null" disabled>-- Seleccione una estadía --</option>
-            <option *ngFor="let c of availableCheckIns" [ngValue]="c.id">
-              Habitación {{ c.booking?.roomNumber }} - Huésped: {{ c.booking?.guestFirstName }} {{ c.booking?.guestLastName }}
-            </option>
-          </select>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Formulario Principal (Estilo Glass) -->
   <div class="glass-form marginUpDown" *ngIf="!loading">
     <div class="mb-4">
       <label class="form-label">Valoración *</label>
-      <div class="input-group ">
+      <div class="input-group">
         <span class="input-group-text"><i class="fa-solid fa-star"></i></span>
         <select class="form-control custom-select inputExtra" [(ngModel)]="rating">
           <option *ngFor="let r of [1,2,3,4,5]" [value]="r">
@@ -53,9 +32,9 @@
       </div>
     </div>
 
-    <div class="mb-4 ">
+    <div class="mb-4">
       <label class="form-label">Tu Comentario *</label>
-      <div class="input-group align-items-start ">
+      <div class="input-group align-items-start">
         <textarea 
           class="form-control custom-textarea inputExtra" 
           rows="4" 
@@ -67,7 +46,7 @@
     <button 
       class="btn btn-primary w-100" 
       (click)="saveComment()" 
-      [disabled]="!content.trim() || (!checkInId && !selectedCheckInId)">
+      [disabled]="!content.trim()">
       <i class="fa-solid fa-check me-2"></i> {{ isEditMode ? 'Guardar Cambios' : 'Publicar Comentario' }}
     </button>
   </div>
