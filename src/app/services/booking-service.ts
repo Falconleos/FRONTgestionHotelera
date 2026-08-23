@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { BookingDtoResponse, BookingCancellationDtoRequest } from '../models/booking.model';
+import { BookingDtoResponse, BookingCancellationDtoRequest, BookingCancellationDtoResponse } from '../models/booking.model';
 import { PaymentDTORequest, PaymentDTOResponse } from '../models/payment.model';
 import { RoomDtoResponse } from '../models/room.model';
 
@@ -10,6 +10,7 @@ import { RoomDtoResponse } from '../models/room.model';
 })
 export class BookingService {
   private apiUrl = 'http://localhost:8080/private/booking';
+  private cancellationUrl = 'http://localhost:8080/private/booking-cancellation';
 
   constructor(private http: HttpClient) {}
 
@@ -31,11 +32,15 @@ export class BookingService {
     return this.http.patch<BookingDtoResponse>(`${this.apiUrl}/${id}/confirm`, {}, { withCredentials: true });
   }
 
-  cancelBooking(request: BookingCancellationDtoRequest): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/cancel`, request, { withCredentials: true });
+  cancelBooking(request: BookingCancellationDtoRequest): Observable<BookingCancellationDtoResponse> {
+    return this.http.post<BookingCancellationDtoResponse>(`${this.apiUrl}/cancel`, request, { withCredentials: true });
   }
 
-  // --- NUEVOS MÉTODOS PARA SEÑAS DE RESERVAS ---
+  getCancellationHistory(): Observable<BookingCancellationDtoResponse[]> {
+  return this.http.get<BookingCancellationDtoResponse[]>(this.cancellationUrl, { withCredentials: true });
+}
+
+  // --- MÉTODOS PARA SEÑAS DE RESERVAS ---
 
   addPaymentToBooking(request: PaymentDTORequest): Observable<PaymentDTOResponse> {
     return this.http.post<PaymentDTOResponse>('http://localhost:8080/api/accounts/bookings/payments', request, { withCredentials: true });
@@ -44,5 +49,7 @@ export class BookingService {
   getPaymentsByBookingId(bookingId: number): Observable<PaymentDTOResponse[]> {
     return this.http.get<PaymentDTOResponse[]>(`http://localhost:8080/api/accounts/bookings/${bookingId}/payments`, { withCredentials: true });
   }
+
+
 
 }

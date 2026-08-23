@@ -70,9 +70,14 @@ export class BookingListComponent implements OnInit {
     this.bookingService.getAll().subscribe({
       next: (data) => {
         const allBookings = Array.isArray(data) ? [...data] : [];
+        
+        // Filtramos para mostrar únicamente las que están activas o en estados válidos de gestión
         this.bookings = allBookings.filter(
           (b) => b.state === 'PENDING' || b.state === 'CONFIRMED'
+          // O de forma más estricta, excluyendo las concluidas/canceladas:
+          // b.state !== 'CANCELLED' && b.state !== 'NO_SHOW' && b.state !== 'CONCLUDED' && b.state !== 'INTERRUPTED'
         );
+        
         this.loading = false;
         this.cdr.markForCheck();
       },
@@ -93,26 +98,68 @@ export class BookingListComponent implements OnInit {
 
     const reason = prompt('Por favor, ingrese el motivo de la cancelación:');
     if (reason === null) {
-      return;
+      return; // El usuario canceló la acción
     }
 
-    const userIdStr = localStorage.getItem('userId');
-    const userId = userIdStr ? Number(userIdStr) : 1;
+    // 1. Primero consultamos la cuenta de la reserva para ver si tiene pagos
+    this.accountService.getAccountByBookingId(id).subscribe({
+      next: (account: any) => {
+        // Verificamos si la cuenta tiene pagos realizados (paidAmount > 0 o listado de pagos)
+        const hasPayments = account && account.paidAmount > 0;
+        
+        let issueCreditNote = false;
 
-    const request = {
-      bookingId: id,
-      reason: reason.trim(),
-      userId: userId
-    };
+        // 2. Solo si tiene pagos, le preguntamos al usuario si desea emitir la nota de crédito
+        if (hasPayments) {
+          issueCreditNote = confirm('Esta reserva cuenta con pagos registrados. ¿Desea emitir una nota de crédito/reintegro?');
+        }
 
-    this.bookingService.cancelBooking(request).subscribe({
-      next: () => {
-        alert(`Reserva ID ${id} cancelada exitosamente.`);
-        this.loadBookings();
+        const userIdStr = localStorage.getItem('userId');
+        const userId = userIdStr ? Number(userIdStr) : 1;
+
+        const request = {
+          bookingId: id,
+          reason: reason.trim(),
+          userId: userId,
+          issueCreditNote: issueCreditNote
+        };
+
+        // 3. Ejecutamos la cancelación enviando el request
+        this.bookingService.cancelBooking(request).subscribe({
+          next: () => {
+            alert(`Reserva ID ${id} cancelada exitosamente.`);
+            this.loadBookings();
+          },
+          error: (err) => {
+            alert('Error al intentar cancelar la reserva.');
+            console.error(err);
+          }
+        });
       },
       error: (err) => {
-        alert('Error al intentar cancelar la reserva.');
-        console.error(err);
+        // Si por alguna razón no se encuentra la cuenta, permitimos continuar con la cancelación estándar sin nota de crédito
+        console.warn('No se pudo obtener la cuenta para validar pagos, procediendo a cancelar...', err);
+        
+        const userIdStr = localStorage.getItem('userId');
+        const userId = userIdStr ? Number(userIdStr) : 1;
+
+        const request = {
+          bookingId: id,
+          reason: reason.trim(),
+          userId: userId,
+          issueCreditNote: false
+        };
+
+        this.bookingService.cancelBooking(request).subscribe({
+          next: () => {
+            alert(`Reserva ID ${id} cancelada exitosamente.`);
+            this.loadBookings();
+          },
+          error: (errBooking) => {
+            alert('Error al intentar cancelar la reserva.');
+            console.error(errBooking);
+          }
+        });
       }
     });
   }

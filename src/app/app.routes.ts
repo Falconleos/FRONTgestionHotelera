@@ -24,6 +24,7 @@ import { RoomAttentionListComponent } from './components/room-attention-list-com
 import { RoomAttentionFormComponent } from './components/room-attention-form-component/room-attention-form-component';
 import { AccountDetailComponent } from './components/account-detail-component/account-detail-component';
 import { GalleryComponent } from './components/gallery-component/gallery-component';
+import { CreditNoteListComponent } from './components/credit-note-list-component/credit-note-list-component'; // <-- NUEVA IMPORTACIÓN
 import { authGuard } from './guards/auth-guard';
 
 export const routes: Routes = [
@@ -49,7 +50,7 @@ export const routes: Routes = [
       { path: 'check-ins', component: CheckInListComponent },
       { path: 'check-ins/nuevo', component: CheckInCreateComponent },
       
-      // --- Rutas corregidas a Bookings ---
+      // --- Rutas de Bookings ---
       { path: 'bookings/:bookingId/servicios', component: RoomAttentionListComponent },
       { path: 'bookings/:bookingId/servicios/nuevo', component: RoomAttentionFormComponent },
       { path: 'bookings/:bookingId/cuenta', component: AccountDetailComponent },
@@ -66,6 +67,7 @@ export const routes: Routes = [
       
       { path: 'accounts', component: AccountListComponent },
       { path: 'payments', component: PaymentListComponent },
+      { path: 'credit-notes', component: CreditNoteListComponent }, // <-- NUEVA RUTA REGISTRADA
     ]
   },
   { path: '**', redirectTo: '' }

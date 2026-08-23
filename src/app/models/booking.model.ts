@@ -50,11 +50,12 @@ export interface BookingDtoResponse {
   createdAt: string;       
 }
 
-// --- NUEVOS MODELOS DE CANCELACIÓN ---
+// --- MODELOS DE CANCELACIÓN ACTUALIZADOS ---
 
 export interface BookingCancellationDtoRequest {
-  reason: string;
-  userId: number;
+  bookingId: number; // Asegúrate de incluir el bookingId que requiere la API
+  reason?: string;
+  issueCreditNote?: boolean; // NUEVO: Indica si se desea emitir nota de crédito
 }
 
 export interface BookingCancellationDtoResponse {

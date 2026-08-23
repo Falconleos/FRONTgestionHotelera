@@ -29,6 +29,10 @@
       <a routerLink="/dashboard/accounts" routerLinkActive="active">
         <i class="fa-solid fa-file-invoice-dollar"></i> Cuentas
       </a>
+      <!-- NUEVA OPCIÓN: Notas de Crédito -->
+      <a routerLink="/dashboard/credit-notes" routerLinkActive="active">
+        <i class="fa-solid fa-file-invoice"></i> Notas de Crédito
+      </a>
       <a routerLink="/dashboard/usuarios" routerLinkActive="active">
         <i class="fa-solid fa-users"></i> Usuarios
       </a>
@@ -60,24 +64,24 @@
         
         <!-- Perfil de usuario en la barra superior -->
         <div class="user-profile-container">
-  <div class="user-avatar-wrapper">
-    <img *ngIf="avatarUrl; else defaultIcon" 
-         [src]="avatarUrl" 
-         (error)="avatarUrl = null" 
-         alt="Avatar" 
-         class="top-user-avatar">
-         
-    <ng-template #defaultIcon>
-      <div class="top-user-default-icon">
-        <i class="fa-solid fa-user"></i>
-      </div>
-    </ng-template>
-  </div>
-  <span class="user-info">
-    Bienvenido, <strong>{{ username }}</strong> 
-    <span class="text-muted" *ngIf="userRole">({{ userRole }})</span>
-  </span>
-</div>
+          <div class="user-avatar-wrapper">
+            <img *ngIf="avatarUrl; else defaultIcon" 
+                 [src]="avatarUrl" 
+                 (error)="avatarUrl = null" 
+                 alt="Avatar" 
+                 class="top-user-avatar">
+                 
+            <ng-template #defaultIcon>
+              <div class="top-user-default-icon">
+                <i class="fa-solid fa-user"></i>
+              </div>
+            </ng-template>
+          </div>
+          <span class="user-info">
+            Bienvenido, <strong>{{ username }}</strong> 
+            <span class="text-muted" *ngIf="userRole">({{ userRole }})</span>
+          </span>
+        </div>
 
       </div>
     </header>

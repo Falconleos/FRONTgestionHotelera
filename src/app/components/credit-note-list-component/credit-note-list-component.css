@@ -27,7 +27,7 @@ h2, h3, h5, h6 {
   color: #94a3b8 !important;
 }
 
-/* --- BARRA MODERNA DE ESCANEO DE QR --- */
+/* --- BARRA MODERNA DE BÚSQUEDA --- */
 .qr-scanner-card {
   background: rgba(15, 23, 42, 0.75) !important;
   -webkit-backdrop-filter: blur(16px);
@@ -72,9 +72,6 @@ h2, h3, h5, h6 {
   margin: 0 auto;
 }
 
-
-
-/* Número de habitación grande en la parte superior */
 .room-badge {
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(79, 70, 229, 0.15));
   border: 1px solid rgba(129, 140, 248, 0.3);
@@ -82,17 +79,10 @@ h2, h3, h5, h6 {
   border-radius: 8px;
 }
 
-.room-number {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: #818cf8;
-  letter-spacing: -0.5px;
-}
-
 .card-title {
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: #f8fafc;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #38bdf8;
 }
 
 .card-info {
@@ -100,7 +90,6 @@ h2, h3, h5, h6 {
   line-height: 1.5;
 }
 
-/* Contenedor del Código QR dentro de la Card */
 .qr-badge-container {
   background: rgba(2, 6, 23, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -181,7 +170,6 @@ h2, h3, h5, h6 {
   transform: translateY(-1px);
 }
 
-/* Botones de acción general */
 .btn {
   font-weight: 600;
   font-size: 12px;
@@ -194,17 +182,6 @@ h2, h3, h5, h6 {
   padding: 6px 10px;
 }
 
-.btn-danger {
-  background: rgba(239, 68, 68, 0.2);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #fca5a5;
-}
-
-.btn-danger:hover:not(:disabled) {
-  background: rgba(239, 68, 68, 0.35);
-  color: #ffffff;
-}
-
 .btn-dark-solid {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -214,25 +191,6 @@ h2, h3, h5, h6 {
 .btn-dark-solid:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.15);
   color: #ffffff;
-}
-
-/* Campos de formulario */
-.form-control-sm, .form-select-sm {
-  font-size: 0.875rem;
-  border-radius: 8px;
-  background: rgba(15, 23, 42, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #f8fafc;
-  padding: 0.5rem 0.75rem;
-  width: 100% !important;
-  box-sizing: border-box;
-}
-
-.form-control-sm:focus, .form-select-sm:focus {
-  border-color: rgba(129, 140, 248, 0.5);
-  box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
-  background: rgba(15, 23, 42, 0.95);
-  color: #f8fafc;
 }
 
 /* Alertas Glass */
@@ -265,36 +223,68 @@ h2, h3, h5, h6 {
   padding: 20px;
 }
 
-/* Forzar distribución horizontal de las cards */
-.cards-grid-row {
-  display: flex !important;
-  flex-wrap: wrap !important;
-  gap: 1.5rem; /* Espacio entre las cards */
+/* --- ESTILOS DEL MODAL (Glassmorphism Reducido) --- */
+.modal-backdrop-custom {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(2, 6, 23, 0.75);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050;
 }
 
-.col-card-item {
-  flex: 0 0 calc(25% - 1.125rem); /* Fuerza exactamente 4 columnas por fila */
-  max-width: calc(25% - 1.125rem);
+.modal-card-custom {
+  width: 100%;
+  max-width: 380px; /* Reducido a la mitad aproximadamente */
+  background: rgba(15, 23, 42, 0.9);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+  color: #f8fafc;
+  animation: fadeInModal 0.2s ease-out;
 }
 
-/* Responsividad para pantallas medianas y chicas */
-@media (max-width: 1400px) {
-  .col-card-item {
-    flex: 0 0 calc(33.333% - 1rem); /* 3 por fila en pantallas medianas */
-    max-width: calc(33.333% - 1rem);
+.detail-item-box {
+  background: rgba(2, 6, 23, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 8px 10px;
+  height: 100%;
+}
+
+.d-small-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.reason-box {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 0.85rem;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+@keyframes fadeInModal {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-}
-
-@media (max-width: 992px) {
-  .col-card-item {
-    flex: 0 0 calc(50% - 0.75rem); /* 2 por fila en tablets */
-    max-width: calc(50% - 0.75rem);
-  }
-}
-
-@media (max-width: 576px) {
-  .col-card-item {
-    flex: 0 0 100%; /* 1 por fila en celulares */
-    max-width: 100%;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

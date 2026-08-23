@@ -1,0 +1,111 @@
+<div class="container-fluid paddingExtra">
+  <div class="header-section mb-4">
+    <h2 class="fw-bold text-main mb-1">Listado de Notas de Crédito</h2>
+    <p class="text-secondary">Consulte el registro de todas las notas de crédito emitidas en el sistema.</p>
+  </div>
+
+  <!-- Alertas de Carga / Error -->
+  <div *ngIf="loading" class="alert alert-info">Cargando información...</div>
+  <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+
+  <!-- SECCIÓN: Tabla limpia de Notas de Crédito -->
+  <section>
+    <div *ngIf="creditNotes.length === 0 && !loading" class="text-secondary">
+      No hay notas de crédito registradas en el sistema.
+    </div>
+
+    <div class="table-responsive shadow-sm rounded" *ngIf="creditNotes.length > 0">
+      <table class="table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Cuenta</th>
+            <th>Cliente</th>
+            <th>DNI</th>
+            <th>Monto</th>
+            <th>Fecha de Emisión</th>
+            <th>Motivo</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let note of creditNotes">
+            <td>#{{ note.id }}</td>
+            <td>Cuenta #{{ note.accountId }}</td>
+            <td class="fw-semibold">
+              {{ note.account?.user?.name || 'N/D' }} {{ note.account?.user?.surname || '' }}
+            </td>
+            <td>{{ note.account?.user?.dni || 'N/D' }}</td>
+            <td class="fw-bold text-success">${{ note.amount }}</td>
+            <td>{{ note.issuedAt || note.issueDate }}</td>
+            <td class="text-truncate" style="max-width: 200px;" title="{{ note.reason }}">{{ note.reason }}</td>
+            <td>
+              <button class="btn btn-dark-solid btn-sm" (click)="viewDetail(note.id)">Detalle</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- MODAL DE DETALLE DE CANCELACIÓN (Glassmorphism Ordenado) -->
+  <div class="modal-backdrop-custom" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-card-custom p-4" (click)="$event.stopPropagation()">
+      <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-secondary pb-3">
+        <h5 class="fw-bold m-0 text-main">Detalle de Cancelación de Reserva</h5>
+      </div>
+
+      <!-- Estado de carga del detalle -->
+      <div *ngIf="loadingDetail" class="alert alert-info py-2 my-2">Buscando datos de la cancelación...</div>
+      
+      <!-- Mensaje de error si falla o no existe -->
+      <div *ngIf="detailError" class="alert alert-danger py-2 my-2">{{ detailError }}</div>
+
+      <!-- Datos de la cancelación vinculada -->
+      <div *ngIf="cancellationDetail && !loadingDetail" class="detail-content mt-2">
+        <div class="row g-3">
+          <div class="col-6">
+            <div class="detail-item-box">
+              <span class="text-secondary d-small-label">ID de Cancelación</span>
+              <strong class="text-main fs-6">#{{ cancellationDetail.id }}</strong>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="detail-item-box">
+              <span class="text-secondary d-small-label">Reserva Vinculada</span>
+              <strong class="text-main fs-6">#{{ cancellationDetail.bookingId }}</strong>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="detail-item-box">
+              <span class="text-secondary d-small-label">Cliente (Registrado)</span>
+              <strong class="text-main fs-6">{{ cancellationDetail.nombreApellido || 'N/D' }}</strong>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="detail-item-box">
+              <span class="text-secondary d-small-label">Empleado Responsable</span>
+              <strong class="text-main fs-6">{{ cancellationDetail.employeeUsername || 'N/D' }}</strong>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="detail-item-box">
+              <span class="text-secondary d-small-label">Fecha de Cancelación</span>
+              <strong class="text-main fs-6">{{ cancellationDetail.cancellationDate || 'N/D' }}</strong>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="detail-item-box">
+              <span class="text-secondary d-small-label mb-1">Motivo de Cancelación</span>
+              <p class="text-main reason-box m-0">{{ cancellationDetail.reason || 'Sin motivo especificado' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end mt-4 pt-3 border-top border-secondary">
+        <button class="btn btn-dark-solid px-4 py-2" (click)="closeModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>

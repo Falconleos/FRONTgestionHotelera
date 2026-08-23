@@ -32,7 +32,7 @@
   <div *ngIf="loading" class="alert alert-info">Cargando información...</div>
   <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
 
-  <!-- SECCIÓN SUPERIOR: Cards de reservas pendientes/confirmadas para hoy (4 por fila gracias a col-xl-3) -->
+  <!-- SECCIÓN SUPERIOR: Cards de reservas pendientes/confirmadas para hoy (4 por fila) -->
   <section class="mb-5">
     <h3 class="mb-3 text-main">Reservas para Check-in Hoy</h3>
     
@@ -40,10 +40,10 @@
       No hay reservas pendientes o confirmadas para realizar check-in hoy.
     </div>
 
-    <!-- Contenedor de grilla para las cards -->
-    <div class="row g-3">
-      <div class="col-12 col-md-6 col-lg-4 col-xl-3" *ngFor="let booking of pendingBookingsToday">
-        <div class="card booking-card shadow-sm">
+    <!-- Contenedor de grilla optimizado -->
+    <div class="row g-4 cards-grid-row">
+      <div class="col-card-item" *ngFor="let booking of pendingBookingsToday">
+        <div class="card booking-card shadow-sm w-100">
           
           <!-- Bloque Superior (Información de la reserva) -->
           <div>
@@ -175,10 +175,9 @@
     </div>
   </div>
 
-  <!-- MODAL FLOTANTE SUPERPUESTO SOBRE LAS CARDS (Cierra al hacer click fuera) -->
-  <div *ngIf="selectedBookingForQr" (click)="closeQrModal()" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); z-index: 1070; display: flex; align-items: center; justifyContent: center;">
+  <!-- MODAL FLOTANTE SUPERPUESTO SOBRE LAS CARDS -->
+  <div *ngIf="selectedBookingForQr" (click)="closeQrModal()" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); z-index: 1070; display: flex; align-items: center; justify-content: center;">
     
-    <!-- Tarjeta flotante con tamaño similar a las cards (320px) que flota exactamente arriba -->
     <div class="booking-card shadow-lg border border-secondary p-4" style="width: 320px !important; height: auto !important; z-index: 1080; background: rgba(15, 23, 42, 0.95) !important; margin: auto;" (click)="$event.stopPropagation()">
       
       <div class="d-flex justify-content-between align-items-center border-bottom border-secondary pb-2 mb-3">
