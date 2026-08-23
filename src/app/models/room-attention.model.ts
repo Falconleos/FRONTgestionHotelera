@@ -1,14 +1,22 @@
+export interface ItemDtoResponse {
+  id: number;
+  description: string;
+  unitPrice: number;
+  isService: boolean;
+  quantity: number;
+}
+
 export interface RoomAttentionDtoRequest {
-  checkInId: number;
+  bookingId: number; // Actualizado de checkInId a bookingId
   itemId: number;
   quantity: number;
 }
 
 export interface RoomAttentionDtoResponse {
   id: number;
-  checkInId: number;
+  bookingId: number; // Actualizado de checkInId a bookingId
   itemId: number;
-  itemDescription: string;
+  itemDTOResponse: ItemDtoResponse; // Agregado el objeto de respuesta del ítem
   isService: boolean;
   quantity: number;
   unitPrice: number;

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { RoomAttentionService } from '../../services/room-attention-service';
-import { ItemService } from '../../services/item-service'; // Asegúrate de tener este servicio para listar ítems/servicios
+import { ItemService } from '../../services/item-service';
 import { RoomAttentionDtoRequest } from '../../models/room-attention.model';
 
 @Component({
@@ -14,7 +14,7 @@ import { RoomAttentionDtoRequest } from '../../models/room-attention.model';
   styleUrls: ['./room-attention-form-component.css']
 })
 export class RoomAttentionFormComponent implements OnInit {
-  checkInId!: number;
+  bookingId!: number;
   availableItems: any[] = [];
   selectedItem: any = null;
   quantity: number = 1;
@@ -31,12 +31,12 @@ export class RoomAttentionFormComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const idParam = this.route.snapshot.paramMap.get('checkInId');
+    const idParam = this.route.snapshot.paramMap.get('bookingId');
     if (idParam) {
-      this.checkInId = +idParam;
+      this.bookingId = +idParam;
       this.loadAvailableItems();
     } else {
-      this.errorMessage = 'ID de check-in no válido.';
+      this.errorMessage = 'ID de reserva no válido.';
       this.loadingItems = false;
     }
   }
@@ -59,16 +59,14 @@ export class RoomAttentionFormComponent implements OnInit {
   }
 
   onItemChange(): void {
-    // Si es un servicio (isService === true), por regla general la cantidad es 1 fija o no acumulativa
-    if (this.selectedItem && this.selectedItem.isService) {
-      this.quantity = 1;
-    }
+    // Ya no reseteamos la cantidad a 1 de forma forzosa al cambiar de ítem/servicio,
+    // permitiendo que el usuario pueda escribir la cantidad que necesite.
   }
 
   calculateSubtotal(): number {
     if (!this.selectedItem) return 0;
     const price = this.selectedItem.price || this.selectedItem.unitPrice || 0;
-    const qty = this.selectedItem.isService ? 1 : (this.quantity || 1);
+    const qty = this.quantity || 1; // Usamos siempre la cantidad ingresada
     return price * qty;
   }
 
@@ -78,7 +76,7 @@ export class RoomAttentionFormComponent implements OnInit {
       return;
     }
 
-    if (!this.selectedItem.isService && (!this.quantity || this.quantity <= 0)) {
+    if (!this.quantity || this.quantity <= 0) {
       alert('La cantidad debe ser mayor a 0.');
       return;
     }
@@ -92,15 +90,15 @@ export class RoomAttentionFormComponent implements OnInit {
     if (confirm(confirmMsg)) {
       this.submitting = true;
       const request: RoomAttentionDtoRequest = {
-        checkInId: this.checkInId,
+        bookingId: this.bookingId,
         itemId: this.selectedItem.id,
-        quantity: this.selectedItem.isService ? 1 : this.quantity
+        quantity: this.quantity // Enviamos la cantidad que el usuario colocó
       };
 
       this.roomAttentionService.addAttention(request).subscribe({
         next: () => {
           alert('Consumo registrado exitosamente.');
-          this.router.navigate([`/dashboard/check-ins/${this.checkInId}/servicios`]);
+          this.router.navigate([`/dashboard/bookings/${this.bookingId}/servicios`]);
         },
         error: (err) => {
           this.submitting = false;

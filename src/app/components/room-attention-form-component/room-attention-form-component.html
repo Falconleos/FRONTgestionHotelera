@@ -3,7 +3,7 @@
     <h2>
       <i class="fa-solid fa-cart-plus me-2">&nbsp;</i> Registrar Consumo o Servicio
     </h2>
-    <button class="btn btn-secondary btn-sm marginUpDown" [routerLink]="['/dashboard/check-ins', checkInId, 'servicios']">
+    <button class="btn btn-secondary btn-sm marginUpDown" [routerLink]="['/dashboard/bookings', bookingId, 'servicios']">
       <i class="fa-solid fa-arrow-left me-1"></i> Volver
     </button>
   </div>
@@ -26,7 +26,7 @@
         <label for="itemSelect" class="form-label">Seleccionar Ítem o Servicio *</label>
         <div class="input-group">
           <span class="input-group-text"><i class="fa-solid fa-list-ul"></i></span>
-          <select id="itemSelect " class="form-control custom-select marginUpDown" [(ngModel)]="selectedItem" name="selectedItem" (change)="onItemChange()" required>
+          <select id="itemSelect" class="form-control custom-select marginUpDown" [(ngModel)]="selectedItem" name="selectedItem" (change)="onItemChange()" required>
             <option [ngValue]="null" disabled>-- Elige una opción del catálogo --</option>
             <option *ngFor="let item of availableItems" [ngValue]="item">
               {{ item.description || item.name }} - ${{ item.price || item.unitPrice | number:'1.2-2' }} 
@@ -36,8 +36,8 @@
         </div>
       </div>
 
-      <!-- Cantidad (Solo se muestra si NO es un servicio) -->
-      <div class="mb-4" *ngIf="selectedItem && !selectedItem.isService">
+      <!-- Cantidad (Visible para ambos: ítems y servicios) -->
+      <div class="mb-4" *ngIf="selectedItem">
         <label for="quantityInput" class="form-label">Cantidad *</label>
         <div class="input-group">
           <span class="input-group-text"><i class="fa-solid fa-hashtag"></i></span>
@@ -45,19 +45,11 @@
         </div>
       </div>
 
-      <!-- Indicador visual si es Servicio (Cantidad fija a 1) -->
-      <div class="mb-4 alert alert-secondary marginBottomExtra" *ngIf="selectedItem && selectedItem.isService">
-        <div class="d-flex align-items-center">
-          <i class="fa-solid fa-circle-info me-2 fs-5 text-info">&nbsp;</i>
-          <small class="mb-0 text-white-50">Este elemento es un <strong>servicio</strong>. Se registrará con cantidad única (1).</small>
-        </div>
-      </div>
-
       <!-- Resumen de Subtotal -->
-      <div class="glass-subcard p-4 mb-4 " *ngIf="selectedItem ">
+      <div class="glass-subcard p-4 mb-4" *ngIf="selectedItem">
         <div class="d-flex align-items-center mb-3 marginExtra">
           <div class="header-icon-container me-2 marginExtra">
-            <i class="fa-solid fa-receipt text-indigo fs-5 "></i>
+            <i class="fa-solid fa-receipt text-indigo fs-5"></i>
           </div>
           <h5 class="card-title text-white mb-0 fs-6 fw-bold">Resumen del Cargo</h5>
         </div>
@@ -74,11 +66,11 @@
 
       <!-- Botones de Acción -->
       <div class="d-flex justify-content-end gap-2 pt-2 marginUpDown">
-        <button type="button" class="btn btn-secondary" [routerLink]="['/dashboard/check-ins', checkInId, 'servicios']">
+        <button type="button" class="btn btn-secondary" [routerLink]="['/dashboard/bookings', bookingId, 'servicios']">
           Cancelar
         </button>
         <button type="submit" class="btn btn-primary marginLeft" [disabled]="!selectedItem || submitting">
-          <i class="fa-solid" [ngClass]="submitting ? 'fa-spinner fa-spin ' : 'fa-check'" *ngIf="submitting"></i>
+          <i class="fa-solid" [ngClass]="submitting ? 'fa-spinner fa-spin' : 'fa-check'" *ngIf="submitting"></i>
           {{ submitting ? 'Guardando...' : 'Confirmar y Registrar' }}
         </button>
       </div>

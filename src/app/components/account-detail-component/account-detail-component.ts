@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccountService } from '../../services/account-service';
 import { CheckInService } from '../../services/check-in-service';
+import { RoomAttentionService } from '../../services/room-attention-service'; // Importamos el servicio de atenciones
 import { AccountDTOResponse } from '../../models/account.model';
 
 @Component({
@@ -36,11 +37,12 @@ export class AccountDetailComponent implements OnInit {
     private router: Router,
     private accountService: AccountService,
     private checkInService: CheckInService,
+    private roomAttentionService: RoomAttentionService, // Inyectamos el servicio
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    const idParam = this.route.snapshot.paramMap.get('checkInId');
+    const idParam = this.route.snapshot.paramMap.get('bookingId');
     if (idParam) {
       this.checkInId = +idParam;
       this.loadData();
@@ -51,28 +53,49 @@ export class AccountDetailComponent implements OnInit {
     this.loading = true;
     this.errorMessage = '';
 
+    // 1. Cargamos la cuenta y las atenciones de habitación en paralelo o secuencia
     this.accountService.getAccountByCheckInId(this.checkInId).subscribe({
       next: (accountData: AccountDTOResponse) => {
         this.account = accountData;
         
         // Sincronizamos el porcentaje que viene del backend
         this.adjustmentPercentage = accountData.adjustmentPercentage ?? 0;
-        
-        // Inicializamos los totales usando la función dinámica de cálculo
-        this.adjustedTotal = this.calculateAdjustedTotal();
-        this.paymentAmount = this.calculateRemaining();
 
-        // Obtenemos el check-in para conocer su estado actual
-        this.checkInService.getAll().subscribe({
-          next: (checkIns) => {
-            const currentCheckIn = checkIns.find(c => c.id === this.checkInId);
-            if (currentCheckIn) {
-              this.checkInState = currentCheckIn.checkInState;
+        // 2. Buscamos los room services / atenciones usando el bookingId (que almacenamos en checkInId)
+        this.roomAttentionService.getByBooking(this.checkInId).subscribe({
+          next: (attentions) => {
+            // Mapeamos las atenciones al formato de 'items' que espera la tabla del HTML
+            if (this.account) {
+              this.account.items = attentions.map(att => ({
+                description: att.itemDTOResponse?.description || 'Room Service / Consumo',
+                quantity: att.quantity,
+                subtotal: att.subtotal
+              }));
             }
-            this.loading = false;
-            this.cdr.markForCheck();
+
+            // Inicializamos los totales y pagos después de cargar los ítems
+            this.adjustedTotal = this.calculateAdjustedTotal();
+            this.paymentAmount = this.calculateRemaining();
+
+            // Obtenemos el check-in para conocer su estado actual
+            this.checkInService.getAll().subscribe({
+              next: (checkIns) => {
+                const currentCheckIn = checkIns.find(c => c.id === this.checkInId);
+                if (currentCheckIn) {
+                  this.checkInState = currentCheckIn.checkInState;
+                }
+                this.loading = false;
+                this.cdr.markForCheck();
+              },
+              error: () => {
+                this.loading = false;
+                this.cdr.markForCheck();
+              }
+            });
           },
-          error: () => {
+          error: (attErr) => {
+            console.error('Error al cargar las atenciones de habitación:', attErr);
+            // Aunque fallen las atenciones, mostramos la cuenta base
             this.loading = false;
             this.cdr.markForCheck();
           }

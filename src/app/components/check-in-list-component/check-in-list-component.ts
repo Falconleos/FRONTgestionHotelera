@@ -246,6 +246,12 @@ export class CheckInListComponent implements OnInit {
     }
   }
 
-  viewAccountPlaceholder(id: number): void { this.router.navigate([`/dashboard/check-ins/${id}/cuenta`]); }
-  servicesPlaceholder(id: number): void { this.router.navigate([`/dashboard/check-ins/${id}/servicios`]); }
+  viewAccountPlaceholder(id: number): void { 
+  this.router.navigate([`/dashboard/bookings/${id}/cuenta`]); // Cambia por tu ruta real
+}
+
+servicesPlaceholder(id: number): void { 
+  this.router.navigate([`/dashboard/bookings/${id}/servicios`]); // Cambia por tu ruta real
+}
+
 }

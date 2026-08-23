@@ -1,13 +1,13 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router'; // Importar RouterModule
+import { RouterModule, Router } from '@angular/router'; // 1. Importar Router
 import { AccountService } from '../../services/account-service';
 import { AccountDTOResponse } from '../../models/account.model';
 
 @Component({
   selector: 'app-account-list',
   standalone: true,
-  imports: [CommonModule, RouterModule], // Agregar RouterModule aquí
+  imports: [CommonModule, RouterModule],
   templateUrl: './account-list-component.html',
   styleUrls: ['./account-list-component.css']
 })
@@ -18,6 +18,7 @@ export class AccountListComponent implements OnInit {
 
   constructor(
     private accountService: AccountService,
+    private router: Router, // 2. Inyectar Router aquí
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -30,7 +31,6 @@ export class AccountListComponent implements OnInit {
     this.accountService.getAllAccounts().subscribe({
       next: (data: AccountDTOResponse[]) => {
         this.accounts = Array.isArray(data) ? data.map(acc => {
-          // Cálculo seguro de totales y saldos si el backend no los trae calculados
           const base = acc.baseAmount || 0;
           const services = acc.servicesTotal || 0;
           const subtotal = base + services;
@@ -54,5 +54,11 @@ export class AccountListComponent implements OnInit {
         this.cdr.markForCheck();
       }
     });
+  }
+
+  // 3. Agregar este método para manejar la navegación al detalle
+  viewAccountDetail(id: number): void {
+    // Asegúrate de que esta ruta coincida con la que tengas en tu archivo de rutas
+    this.router.navigate([`/dashboard/accounts/${id}`]);
   }
 }

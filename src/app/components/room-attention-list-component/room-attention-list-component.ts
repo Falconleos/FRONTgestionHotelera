@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router'; // <--- 1. Importar Router
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { RoomAttentionService } from '../../services/room-attention-service';
 import { RoomAttentionDtoResponse } from '../../models/room-attention.model';
 
@@ -12,7 +12,7 @@ import { RoomAttentionDtoResponse } from '../../models/room-attention.model';
   styleUrls: ['./room-attention-list-component.css']
 })
 export class RoomAttentionListComponent implements OnInit {
-  checkInId!: number;
+  bookingId!: number; // <--- Declarada correctamente aquí
   attentions: RoomAttentionDtoResponse[] = [];
   loading = true;
   errorMessage = '';
@@ -20,19 +20,19 @@ export class RoomAttentionListComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router, // <--- 2. Inyectar Router aquí
+    private router: Router,
     private roomAttentionService: RoomAttentionService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.checkUserRole();
-    const idParam = this.route.snapshot.paramMap.get('checkInId');
+    const idParam = this.route.snapshot.paramMap.get('bookingId');
     if (idParam) {
-      this.checkInId = +idParam;
+      this.bookingId = +idParam;
       this.loadAttentions();
     } else {
-      this.errorMessage = 'ID de check-in no válido.';
+      this.errorMessage = 'ID de reserva no válido.';
       this.loading = false;
     }
   }
@@ -59,14 +59,14 @@ export class RoomAttentionListComponent implements OnInit {
 
   loadAttentions(): void {
     this.loading = true;
-    this.roomAttentionService.getByCheckIn(this.checkInId).subscribe({
+    this.roomAttentionService.getByBooking(this.bookingId).subscribe({
       next: (data) => {
         this.attentions = Array.isArray(data) ? [...data] : [];
         this.loading = false;
         this.cdr.markForCheck();
       },
       error: (err) => {
-        this.errorMessage = 'Error al cargar los servicios de la estadía.';
+        this.errorMessage = 'Error al cargar los servicios de la reserva.';
         this.loading = false;
         this.cdr.markForCheck();
         console.error(err);
@@ -99,6 +99,6 @@ export class RoomAttentionListComponent implements OnInit {
   }
 
   openAddModalPlaceholder(): void {
-    this.router.navigate([`/dashboard/check-ins/${this.checkInId}/servicios/nuevo`]);
+    this.router.navigate([`/dashboard/bookings/${this.bookingId}/servicios/nuevo`]);
   }
 }

@@ -48,7 +48,12 @@ export const routes: Routes = [
       { path: 'bookings/nuevo', component: BookingFormComponent },
       { path: 'check-ins', component: CheckInListComponent },
       { path: 'check-ins/nuevo', component: CheckInCreateComponent },
-      { path: 'check-ins/:checkInId/servicios', component: RoomAttentionListComponent },
+      
+      // --- Rutas corregidas a Bookings ---
+      { path: 'bookings/:bookingId/servicios', component: RoomAttentionListComponent },
+      { path: 'bookings/:bookingId/servicios/nuevo', component: RoomAttentionFormComponent },
+      { path: 'bookings/:bookingId/cuenta', component: AccountDetailComponent },
+
       { path: 'items', component: ItemListComponent },
       { path: 'items/nuevo', component: ItemFormComponent },      
       { path: 'items/editar/:id', component: ItemFormComponent }, 
@@ -61,8 +66,6 @@ export const routes: Routes = [
       
       { path: 'accounts', component: AccountListComponent },
       { path: 'payments', component: PaymentListComponent },
-      { path: 'check-ins/:checkInId/cuenta', component: AccountDetailComponent },
-      { path: 'check-ins/:checkInId/servicios/nuevo', component: RoomAttentionFormComponent },
     ]
   },
   { path: '**', redirectTo: '' }

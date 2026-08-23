@@ -7,13 +7,13 @@ import { RoomAttentionDtoRequest, RoomAttentionDtoResponse } from '../models/roo
   providedIn: 'root'
 })
 export class RoomAttentionService {
-  private apiUrl = 'http://localhost:8080/private/room-attentions'; // Ajusta la URL base si es necesario
+  private apiUrl = 'http://localhost:8080/private/room-attentions';
 
   constructor(private http: HttpClient) {}
 
-  getByCheckIn(checkInId: number): Observable<RoomAttentionDtoResponse[]> {
-    return this.http.get<RoomAttentionDtoResponse[]>(`${this.apiUrl}/check-in/${checkInId}`);
-  }
+  getByBooking(bookingId: number): Observable<RoomAttentionDtoResponse[]> {
+  return this.http.get<RoomAttentionDtoResponse[]>(`${this.apiUrl}/booking/${bookingId}`);
+}
 
   addAttention(request: RoomAttentionDtoRequest): Observable<RoomAttentionDtoResponse> {
     return this.http.post<RoomAttentionDtoResponse>(this.apiUrl, request);
