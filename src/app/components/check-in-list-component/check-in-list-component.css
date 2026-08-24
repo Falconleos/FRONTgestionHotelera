@@ -72,8 +72,6 @@ h2, h3, h5, h6 {
   margin: 0 auto;
 }
 
-
-
 /* Número de habitación grande en la parte superior */
 .room-badge {
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(79, 70, 229, 0.15));
@@ -269,32 +267,78 @@ h2, h3, h5, h6 {
 .cards-grid-row {
   display: flex !important;
   flex-wrap: wrap !important;
-  gap: 1.5rem; /* Espacio entre las cards */
+  gap: 1.5rem;
 }
 
 .col-card-item {
-  flex: 0 0 calc(25% - 1.125rem); /* Fuerza exactamente 4 columnas por fila */
+  flex: 0 0 calc(25% - 1.125rem);
   max-width: calc(25% - 1.125rem);
 }
 
 /* Responsividad para pantallas medianas y chicas */
 @media (max-width: 1400px) {
   .col-card-item {
-    flex: 0 0 calc(33.333% - 1rem); /* 3 por fila en pantallas medianas */
+    flex: 0 0 calc(33.333% - 1rem);
     max-width: calc(33.333% - 1rem);
   }
 }
 
 @media (max-width: 992px) {
   .col-card-item {
-    flex: 0 0 calc(50% - 0.75rem); /* 2 por fila en tablets */
+    flex: 0 0 calc(50% - 0.75rem);
     max-width: calc(50% - 0.75rem);
   }
 }
 
 @media (max-width: 576px) {
   .col-card-item {
-    flex: 0 0 100%; /* 1 por fila en celulares */
+    flex: 0 0 100%;
     max-width: 100%;
   }
+}
+
+/* --- MODAL / PANEL DE CHECK-IN TRADICIONAL --- */
+.modal.fade.show {
+  z-index: 1050; /* Capa base para modales normales */
+}
+
+/* --- MODAL FLOTANTE SUPERPUESTO SOBRE LAS CARDS (QR) --- */
+/* (Aseguramos un z-index ordenado por debajo del error crítico) */
+div[style*="z-index: 1070"] {
+  z-index: 1060 !important;
+}
+
+div[style*="z-index: 1080"] {
+  z-index: 1070 !important;
+}
+
+/* --- MODAL FLOTANTE UNIFICADO PARA CHECK-IN ERROR (ENCIMA DE TODO) --- */
+.error-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.75);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  z-index: 1150 !important; /* ¡Subido para garantizar que esté siempre por encima! */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error-modal-card {
+  width: 100%;
+  max-width: 360px !important;
+  height: auto !important;
+  background: rgba(15, 23, 42, 0.98) !important;
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7) !important;
+  border: 1px solid rgba(239, 68, 68, 0.5) !important;
+  color: #f8fafc;
+  margin: auto;
+  z-index: 1160 !important; /* Capa superior absoluta */
 }

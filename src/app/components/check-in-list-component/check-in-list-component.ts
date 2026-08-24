@@ -185,19 +185,24 @@ export class CheckInListComponent implements OnInit {
 
     this.selectedBookingForCheckIn = booking;
     this.inputDni = booking.guestPhone || '';
-    this.showUserSelector = false;
     this.showNewUserForm = false;
-    this.checkInError = '';
     this.checkInSuccess = '';
+    this.checkInError = '';
     this.selectedUserId = null;
 
-    const hasUser = (booking as any).userId || (booking as any).userBookingUsername || (booking as any).guestId;
+    // Evaluamos si tiene el usuario asociado basándonos en los campos que sí trae el BookingDtoResponse
+    const hasUser = !!booking.username;
 
     if (hasUser) {
+      this.showUserSelector = false;
       this.executeCheckInDirectly(booking.id);
     } else {
+      // Si no tiene usuario asociado, abrimos el selector y mostramos el aviso visual
       this.showUserSelector = true;
+      this.checkInError = "Please select a valid user before checking in.";
     }
+    
+    this.cdr.markForCheck();
   }
 
   executeCheckInDirectly(bookingId: number): void {
